@@ -1,46 +1,75 @@
 import Image from 'next/image';
 import { Card } from '../../components/ui/card';
-import { Button } from '../../components/ui/button';
+import Link from 'next/link';
+import { Button } from '@/components/ui/button';
+import { ArrowRight } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
-const Category = ({ data }) => {
+type CategoriesType = {
+	id: number;
+	title: string;
+	image: string;
+	href: string;
+	isDoubleCol: boolean;
+};
+
+const Category = ({ categories }: { categories: CategoriesType[] }) => {
 	return (
-		<div className='bg-slate-50 px-4 py-16 sm:px-6 lg:px-8'>
-			<div className='mx-auto max-w-7xl'>
-				<h2 className='mb-12 text-center text-3xl font-bold text-slate-900'>
-					Categories
-				</h2>
+		<section className='pt-8 sm:pt-12 md:pt-16'>
+			<h2 className='mb-5 text-2xl sm:text-4xl font-semibold text-foreground'>
+				Categories
+			</h2>
 
-				<div className='grid gap-6 md:grid-cols-2 lg:grid-cols-4'>
-					{data.map((category) => (
+			<div className='grid grid-cols-1 sm:grid-cols-2 gap-5'>
+				{categories.map((c) => {
+					const isSittingRoom = c.title === 'Sitting Room';
+
+					return (
 						<Card
-							key={category.id}
-							className='overflow-hidden border-0 bg-white shadow-sm transition-shadow hover:shadow-md'
+							key={c.id}
+							className={cn(
+								'relative h-[200px] sm:h-[400px] p-3 rounded-sm bg-brand-50 shadow-none border-0 overflow-hidden',
+								'flex flex-row sm:flex-row items-center justify-between sm:justify-around',
+								c.isDoubleCol ? 'col-span-1 sm:col-span-2' : 'col-span-1',
+								!c.isDoubleCol &&
+									'flex-row sm:flex-col-reverse lg:flex-row items-center sm:p-10'
+							)}
 						>
-							<div className='aspect-square overflow-hidden bg-slate-100'>
+							<div
+								className={cn(
+									c.isDoubleCol ? 'self-center' : 'self-center lg:self-end'
+								)}
+							>
+								<h2 className='text-2xl sm:text-3xl md:text-4xl font-semibold'>
+									{c.title}
+								</h2>
+								<Link href={c.href}>
+									<Button className='mt-4 p-2 sm:p-6 text-sm sm:text-base lg:text-lg inline-flex items-center gap-0.5 sm:gap-2 rounded-full bg-transparent hover:bg-brand-100 font-semibold text-primary border border-primary hover:border-primary/70 cursor-pointer transition-colors'>
+										Shop Now <ArrowRight />
+									</Button>
+								</Link>
+							</div>
+
+							<div className={cn(isSittingRoom && '-mr-[15%]')}>
 								<Image
-									src={category.image || '/placeholder.svg'}
-									alt={category.name}
-									width={300}
-									height={300}
-									className='h-full w-full object-cover'
+									src={c.image}
+									alt={c.title}
+									width={600}
+									height={400}
+									className={cn(
+										'object-contain',
+										c.isDoubleCol
+											? 'w-[150px] sm:w-[250px] md:w-[400px]'
+											: 'w-[150px] lg:w-[400px]',
+										isSittingRoom && 'w-[300px] sm:w-[400px] md:w-[550px] lg:w-[700px]'
+									)}
 								/>
 							</div>
-							<div className='p-6'>
-								<h3 className='text-lg font-semibold text-slate-900'>
-									{category.name}
-								</h3>
-								<Button
-									variant='outline'
-									className='mt-4 w-full border-slate-200 text-slate-700 hover:bg-slate-50 bg-transparent'
-								>
-									Shop Now →
-								</Button>
-							</div>
 						</Card>
-					))}
-				</div>
+					);
+				})}
 			</div>
-		</div>
+		</section>
 	);
 };
 

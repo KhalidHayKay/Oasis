@@ -4,7 +4,7 @@
 @custom-variant dark (&:is(.dark *));
 
 /* Using Oasis color system from design tokens */
-:root {
+@theme {
 	/* Brand Colors */
 	--color-brand-800: #7c70ff;
 	--color-brand-700: #897ef1;
@@ -29,8 +29,8 @@
 	--color-grey-50: #ffffff;
 
 	/* Accents */
-	--color-red: #ff5061;
-	--color-orange: #fd862b;
+	--color-brandRed: #ff5061;
+	--color-brandOrange: #fd862b;
 
 	/* Semantic design tokens for app */
 	--card: oklch(1 0 0);

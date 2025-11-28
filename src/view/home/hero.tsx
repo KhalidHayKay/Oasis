@@ -2,31 +2,31 @@ import Image from 'next/image';
 
 const Hero = () => {
 	return (
-		<div className='mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8'>
+		<section className='pt-2 sm:pt-6 lg:pt-16'>
 			<div className='text-center'>
-				<p className='text-xs font-semibold uppercase tracking-widest text-slate-500'>
+				<p className='text-sm sm:text-xl font-bold uppercase tracking-widest text-primary/80'>
 					Furniture Store
 				</p>
-				<h1 className='text-balance mt-4 text-4xl font-bold tracking-tight text-slate-900 sm:text-5xl'>
+				<h1 className='text-balance mt-5 tracking-tight text-slate-900 text-3xl sm:text-5xl md:text-6xl font-semibold md:font-bold lg:max-w-5xl mx-auto'>
 					Discover the Artistry of Modern Contemporary Furniture
 				</h1>
-				<p className='text-balance mx-auto mt-6 max-w-2xl text-lg text-slate-600'>
+				<p className='mx-auto mt-6 max-w-5xl text-lg sm:text-xl text-slate-600'>
 					Experience the elegance and functionality of cutting-edge design where
 					luxury meets innovation in every piece for ultimate relaxation
 				</p>
 			</div>
 
-			<div className='mt-12'>
+			<div className='mt-6 sm:mt-12'>
 				<Image
-					src='/images/hero.png'
+					src='/images/hero.jpg'
 					alt='Modern gray sofa with wooden base'
-					width={600}
-					height={400}
-					className='mx-auto h-auto w-full max-w-3xl rounded-lg object-cover'
+					width={1200}
+					height={750}
+					className='mx-auto sm:max-h-[400px] lg:max-h-[500px] h-auto w-full rounded-md object-cover'
 					priority
 				/>
 			</div>
-		</div>
+		</section>
 	);
 };
 
