@@ -7,13 +7,16 @@ import { Heart, ShoppingCart } from 'lucide-react';
 import Image from 'next/image';
 import { motion, AnimatePresence } from 'motion/react';
 import AppButton from './app-button';
+import currency from '@/lib/utils/currency';
 
 interface ProductCardProps {
 	product: Product;
 }
 const ProductCard = ({ product }: ProductCardProps) => {
 	const [isHovered, setIsHovered] = useState(false);
-	const [selectedColor, setSelectedColor] = useState(0);
+	// const [selectedColor, setSelectedColor] = useState(0);
+
+	const { name, price, featuredImage } = product;
 
 	return (
 		<div className='flex flex-col min-h-[200px] sm:min-h-[350px] md:min-h-[500px]'>
@@ -23,8 +26,8 @@ const ProductCard = ({ product }: ProductCardProps) => {
 				onHoverEnd={() => setIsHovered(false)}
 			>
 				<Image
-					src={product.featured_image || '/placeholder.svg'}
-					alt={product.name}
+					src={featuredImage || '/placeholder.svg'}
+					alt={name}
 					width={600}
 					height={400}
 					className='w-full h-full object-cover'
@@ -51,10 +54,10 @@ const ProductCard = ({ product }: ProductCardProps) => {
 			<div className='flex flex-col'>
 				<div className='flex justify-between items-center gap-2 mb-2'>
 					<h3 className='font-medium text-base sm:text-xl text-foreground line-clamp-2 flex-1  max-w-2/4 truncate'>
-						{product.name}
+						{name}
 					</h3>
 					<span className='font-medium text-sm sm:text-lg bg-accent p-3 rounded-full text-foreground whitespace-nowrap'>
-						${product.price}
+						{currency.code(price.currency)} {price.amount.toFixed(0)}
 					</span>
 				</div>
 
@@ -79,5 +82,27 @@ const ProductCard = ({ product }: ProductCardProps) => {
 		</div>
 	);
 };
+
+export const ProductCardSkeleton = () => (
+	<div className='flex flex-col min-h-[200px] sm:min-h-[350px] md:min-h-[500px] animate-pulse'>
+		{/* Image Placeholder */}
+		<div className='flex-1 relative w-full aspect-square bg-gray-300 rounded-lg mb-4' />
+
+		{/* Title and Price */}
+		<div className='flex flex-col gap-2'>
+			<div className='flex justify-between items-center gap-2 mb-2'>
+				<div className='h-5 sm:h-6 bg-gray-300 rounded w-2/3'></div>
+				<div className='h-5 sm:h-6 bg-gray-300 rounded w-1/4'></div>
+			</div>
+
+			{/* Color options placeholder */}
+			{/* <div className='flex gap-2 mt-auto'>
+				<div className='w-4 h-4 rounded-full bg-gray-300'></div>
+				<div className='w-4 h-4 rounded-full bg-gray-300'></div>
+				<div className='w-4 h-4 rounded-full bg-gray-300'></div>
+			</div> */}
+		</div>
+	</div>
+);
 
 export default ProductCard;

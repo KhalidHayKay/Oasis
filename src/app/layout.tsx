@@ -51,7 +51,7 @@ export default function RootLayout({
 				<Header navLinks={navLinks} />
 
 				{/* Main content */}
-				<main className='min-h-screen pt-20 px-2 sm:px-6 lg:px-12'>{children}</main>
+				<main className='pt-20 px-2 sm:px-6 lg:px-12'>{children}</main>
 
 				{/* <CHANGE> Added Footer component */}
 				<Footer navLinks={navLinks} />

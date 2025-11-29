@@ -3,6 +3,24 @@
 
 @custom-variant dark (&:is(.dark *));
 
+@layer utilities {
+	.heading-section {
+		@apply text-2xl sm:text-4xl font-semibold text-foreground;
+	}
+
+	.spacing-section {
+		@apply pt-8 sm:pt-12 md:pt-16;
+	}
+
+	.scrollbar-hide {
+		-ms-overflow-style: none;
+		scrollbar-width: none;
+	}
+	.scrollbar-hide::-webkit-scrollbar {
+		display: none;
+	}
+}
+
 /* Using Oasis color system from design tokens */
 @theme {
 	/* Brand Colors */

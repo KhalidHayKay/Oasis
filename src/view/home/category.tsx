@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { ArrowRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
-type CategoriesType = {
+type CategoryType = {
 	id: number;
 	title: string;
 	image: string;
@@ -13,12 +13,10 @@ type CategoriesType = {
 	isDoubleCol: boolean;
 };
 
-const Category = ({ categories }: { categories: CategoriesType[] }) => {
+const Category = ({ categories }: { categories: CategoryType[] }) => {
 	return (
-		<section className='pt-8 sm:pt-12 md:pt-16'>
-			<h2 className='mb-5 text-2xl sm:text-4xl font-semibold text-foreground'>
-				Categories
-			</h2>
+		<section className='spacing-section'>
+			<h2 className='heading-section mb-5'>Categories</h2>
 
 			<div className='grid grid-cols-1 sm:grid-cols-2 gap-5'>
 				{categories.map((c) => {

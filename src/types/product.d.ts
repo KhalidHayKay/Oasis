@@ -2,8 +2,11 @@ interface Product {
 	id: string;
 	name: string;
 	description: string;
-	price: number;
-	featured_image: string;
+	price: {
+		amount: number;
+		currency: string;
+	};
+	featuredImage: string;
 	categories: string[];
 	createdAt: string;
 	popularity: number;

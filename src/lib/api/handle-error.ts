@@ -3,7 +3,7 @@ import axios from 'axios';
 export const handleApiError = (error: unknown): never => {
 	if (axios.isAxiosError(error)) {
 		const status = error.response?.status;
-		const message = error.response?.data?.message;
+		const serverMessage = error.response?.data?.message;
 
 		// Laravel validation errors
 		if (status === 422 && error.response?.data?.errors) {
@@ -11,18 +11,35 @@ export const handleApiError = (error: unknown): never => {
 			if (Array.isArray(first)) throw new Error(first[0]);
 		}
 
-		if (status === 404) throw new Error(message || 'Resource not found');
-		if (status === 403) throw new Error(message || 'Not allowed');
-		if (status === 401) throw new Error(message || 'Unauthenticated');
-		if (status! >= 500) throw new Error('Server error. Try again later.');
-
-		// Network issues
-		if (error.request && !error.response) {
-			throw new Error('Network error. Check your connection.');
+		// Unauthorized (401)
+		if (status === 401) {
+			throw new Error('Your session has expired. Please log in again.');
 		}
 
-		throw new Error(message || 'Something went wrong');
+		// Forbidden (403)
+		if (status === 403) {
+			throw new Error('You don’t have permission to perform this action.');
+		}
+
+		// Not Found (404)
+		if (status === 404) {
+			throw new Error('The requested resource was not found.');
+		}
+
+		// Server errors
+		if (status && status >= 500) {
+			throw new Error('Something went wrong on our end. Try again later.');
+		}
+
+		// Network Offline
+		if (error.request && !error.response) {
+			throw new Error('Network error. Check your internet connection.');
+		}
+
+		// Fallback
+		throw new Error(serverMessage || 'Something went wrong. Please try again.');
 	}
 
-	throw new Error('Unexpected error');
+	// Non-Axios errors
+	throw new Error('Unexpected error occurred.');
 };

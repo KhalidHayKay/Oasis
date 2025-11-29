@@ -1,29 +1,12 @@
-import { useConversations } from '@/hooks/useConversation';
 import HomeView from '@/view/home';
+import { productService } from '@/services/productService';
+import { inspirationService } from '@/services/inspirationService';
 
-export default function Page() {
-	const categories = [
-		{
-			id: 1,
-			name: 'Sitting Room',
-			image: '/images/image.png',
-		},
-		{
-			id: 2,
-			name: 'Accessories',
-			image: '/green-plant-in-pot.jpg',
-		},
-		{
-			id: 3,
-			name: 'Kitchen',
-			image: '/red-kettle-teapot.jpg',
-		},
-		{
-			id: 4,
-			name: 'Bedroom',
-			image: '/wooden-nightstand.jpg',
-		},
-	];
+export default async function Page() {
+	const [products, inspo] = await Promise.all([
+		productService.top(),
+		inspirationService.all(),
+	]);
 
-	return <HomeView categories={categories} />;
+	return <HomeView products={products} inspirations={inspo} />;
 }
