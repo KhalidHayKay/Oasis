@@ -1,14 +1,20 @@
 interface Product {
 	id: string;
 	name: string;
-	description: string;
 	price: {
 		amount: number;
 		currency: string;
+		discount: number;
 	};
-	featuredImage: string;
-	categories: string[];
+	featuredImage: ProductImage;
+	category: string;
 	createdAt: string;
 	popularity: number;
-	// colors: string[];
+	colors: string[];
+}
+
+interface ProductDetails extends Product {
+	description: string;
+	images: ProductImage[];
+	rating: number;
 }

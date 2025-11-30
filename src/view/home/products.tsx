@@ -54,7 +54,7 @@ const Products = ({ products }: { products: Product[] }) => {
 				</Select>
 			</div>
 
-			<div className='grid grid-cols-2 lg:grid-cols-4 gap-y-2 gap-x-5 sm:gap-x-20 lg:gap-6 mb-6 sm:mb-12'>
+			<div className='grid grid-cols-2 lg:grid-cols-4 gap-y-5 gap-x-5 sm:gap-x-20 sm:gap-y-5 lg:gap-x-6 lg:gap-y-10 mb-6 sm:mb-12'>
 				<AnimatePresence mode='popLayout'>
 					{!displayedProducts.length
 						? Array.from({ length: 8 }).map((_, i) => <ProductCardSkeleton key={i} />)

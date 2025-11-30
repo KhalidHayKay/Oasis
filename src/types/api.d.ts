@@ -5,3 +5,8 @@ interface TopProductResponse {
 interface InspirationResponse {
 	data: Inspiration[];
 }
+
+interface ProductDetailsResponse {
+	product: ProductDetails;
+	relatedProducts: Product[];
+}

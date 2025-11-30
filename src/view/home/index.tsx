@@ -12,13 +12,13 @@ type HomeViewProps = {
 
 const HomeView = ({ products, inspirations }: HomeViewProps) => {
 	return (
-		<section className='bg-white'>
+		<>
 			<Hero />
 			<Category categories={categories} />
 			<Products products={products} />
 			<Inspiration inspirations={inspirations} />
 			<FAQ FAQItem={FAQs} />
-		</section>
+		</>
 	);
 };
 

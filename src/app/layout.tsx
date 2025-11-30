@@ -40,7 +40,7 @@ export default function RootLayout({
 	const navLinks = [
 		{ label: 'Home', href: routes.page.home },
 		{ label: 'Shop', href: routes.page.shop },
-		{ label: 'Categories', href: routes.page.categories },
+		{ label: 'Categories', href: routes.page.categories.all },
 		{ label: 'Blog', href: routes.page.blog },
 	];
 
@@ -51,7 +51,7 @@ export default function RootLayout({
 				<Header navLinks={navLinks} />
 
 				{/* Main content */}
-				<main className='pt-20 px-2 sm:px-6 lg:px-12'>{children}</main>
+				<main className='bg-white pt-20 px-2 sm:px-6 lg:px-12'>{children}</main>
 
 				{/* <CHANGE> Added Footer component */}
 				<Footer navLinks={navLinks} />

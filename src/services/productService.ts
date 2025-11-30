@@ -3,14 +3,13 @@ import { http } from '@/lib/api/http';
 
 export const productService = {
 	async top() {
-		try {
-			const res: TopProductResponse = await http.get(routes.api.product.top);
-			return res.data;
-		} catch (e) {
-			throw e;
-		}
+		const res: TopProductResponse = await http.get(routes.api.product.top);
+		return res.data;
 	},
-	//   async details(slug: string) {
-	//     return http.get(`/products/${slug}`);
-	//   },
+	async details(slug: string) {
+		const res: ProductDetailsResponse = await http.get(
+			routes.api.product.details(slug)
+		);
+		return res;
+	},
 };
