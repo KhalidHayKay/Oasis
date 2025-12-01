@@ -1,6 +1,5 @@
 'use client';
 
-import { useState, useRef, use, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Button } from '@/components/ui/button';
 import {
@@ -12,10 +11,17 @@ import {
 } from '@/components/ui/select';
 import ProductCard, { ProductCardSkeleton } from '@/components/product-card';
 import { useTopProducts } from '@/hooks/useTopProducts';
+import { cn } from '@/lib/utils';
 
 export type sortType = 'recent' | 'price-low' | 'price-high' | 'popular';
 
-const Products = ({ products }: { products: Product[] }) => {
+const ProductCatalogue = ({
+	products,
+	className,
+}: {
+	products: Product[];
+	className?: string;
+}) => {
 	const {
 		displayedProducts,
 		sortBy,
@@ -33,7 +39,7 @@ const Products = ({ products }: { products: Product[] }) => {
 	];
 
 	return (
-		<section className='spacing-section'>
+		<section className={cn('spacing-section', className)}>
 			<div className='flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-8'>
 				<h1 className='heading-section'>Top Products</h1>
 
@@ -103,4 +109,4 @@ const Products = ({ products }: { products: Product[] }) => {
 	);
 };
 
-export default Products;
+export default ProductCatalogue;

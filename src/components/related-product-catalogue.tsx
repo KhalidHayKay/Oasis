@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import ProductCard from '@/components/product-card';
 import useEmblaCarousel from 'embla-carousel-react';
 
-const Related = ({ products }: { products: Product[] }) => {
+const RelatedProductCatalogue = ({ products }: { products: Product[] }) => {
 	const [emblaRef, emblaApi] = useEmblaCarousel({
 		align: 'start',
 		skipSnaps: false,
@@ -90,4 +90,4 @@ const Related = ({ products }: { products: Product[] }) => {
 	);
 };
 
-export default Related;
+export default RelatedProductCatalogue;

@@ -10,3 +10,10 @@ interface ProductDetailsResponse {
 	product: ProductDetails;
 	relatedProducts: Product[];
 }
+
+interface categoryContentResponse {
+	category: Category;
+	tags: Tag[];
+	products: Product[];
+	relatedProducts: Product[];
+}

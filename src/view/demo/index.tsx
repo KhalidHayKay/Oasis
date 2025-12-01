@@ -2,7 +2,7 @@
 
 import { ModalProvider, useModal } from '@/context/ModalContext';
 import { Button } from '@/components/ui/button';
-import { ModalManager } from '@/components/modal-manager';
+import { ModalManager } from '@/trash/modal-manager';
 
 // Mock product data - replace with actual data from your API
 const mockProduct = {

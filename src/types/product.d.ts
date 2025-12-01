@@ -8,6 +8,7 @@ interface Product {
 	};
 	featuredImage: ProductImage;
 	category: string;
+	tags: string[];
 	createdAt: string;
 	popularity: number;
 	colors: string[];

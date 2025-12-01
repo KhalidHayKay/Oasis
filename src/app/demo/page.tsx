@@ -1,4 +1,4 @@
-import { ModalManager } from '@/components/modal-manager';
+import { ModalManager } from '@/trash/modal-manager';
 import { ModalProvider } from '@/context/ModalContext';
 import DemoView from '@/view/demo';
 

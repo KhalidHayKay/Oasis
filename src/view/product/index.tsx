@@ -1,7 +1,8 @@
 'use client';
 
 import Product from './product';
-import Related from './related';
+import Related from '../../components/related-product-catalogue';
+import RelatedProductCatalogue from '../../components/related-product-catalogue';
 
 const ProductView = ({
 	data: { product, relatedProducts },
@@ -11,7 +12,7 @@ const ProductView = ({
 	return (
 		<>
 			<Product product={product} />
-			<Related products={relatedProducts} />
+			<RelatedProductCatalogue products={relatedProducts} />
 		</>
 	);
 };

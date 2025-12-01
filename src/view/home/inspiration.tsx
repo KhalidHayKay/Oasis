@@ -1,5 +1,6 @@
 'use client';
 
+import HorizontalScrollablePill from '@/components/horizontal-scrollable-pills';
 import InspoItem from '@/components/inspo-item';
 import { Button } from '@/components/ui/button';
 import { useInspirations } from '@/hooks/useInspirations';
@@ -36,24 +37,10 @@ const Inspiration = ({ inspirations }: { inspirations: Inspiration[] }) => {
 					Design inspiration and modern home ideas
 				</h2>
 
-				{/* Category Filter Pills - Horizontally Scrollable */}
-				<div className='relative -mx-4 px-4 sm:mx-0 sm:px-0'>
-					<div className='flex gap-3 overflow-x-auto scrollbar-hide pb-2 snap-x snap-mandatory'>
-						{categories.map((category) => (
-							<button
-								key={category}
-								onClick={() => setActiveCategory(category)}
-								className={`shrink-0 px-5 py-2 rounded-full text-sm font-medium transition-all duration-200 snap-start ${
-									activeCategory === category
-										? 'bg-brand-800 text-white shadow-md'
-										: 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-								}`}
-							>
-								{category}
-							</button>
-						))}
-					</div>
-				</div>
+				<HorizontalScrollablePill
+					categories={categories}
+					active={{ set: setActiveCategory, value: activeCategory }}
+				/>
 			</div>
 
 			<div className='space-y-8'>
