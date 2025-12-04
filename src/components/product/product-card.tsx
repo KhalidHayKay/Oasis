@@ -57,7 +57,10 @@ const Imagery = ({ shouldHover, href, image }: ImageryProps) => {
 const ProductCard = ({ product, className }: ProductCardProps) => {
 	const [selectedColor, setSelectedColor] = useState(0);
 	const [isHovered, setIsHovered] = useState(false);
-	const [hasHoverCapability, setHasHoverCapability] = useState(false);
+	const [hasHoverCapability, setHasHoverCapability] = useState(() => {
+		if (typeof window === 'undefined') return false;
+		return window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+	});
 
 	const { id, name, price, featuredImage, colors } = product;
 
@@ -66,7 +69,6 @@ const ProductCard = ({ product, className }: ProductCardProps) => {
 	// Detect if device has hover capability
 	useEffect(() => {
 		const mediaQuery = window.matchMedia('(hover: hover) and (pointer: fine)');
-		setHasHoverCapability(mediaQuery.matches);
 
 		const handleChange = (e: MediaQueryListEvent) => {
 			setHasHoverCapability(e.matches);

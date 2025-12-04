@@ -6,7 +6,6 @@ import {
 	BreadcrumbPage,
 	BreadcrumbSeparator,
 } from '@/components/ui/breadcrumb';
-import routes from '@/config/routes';
 import { Fragment } from 'react/jsx-runtime';
 
 interface CrumbProps {

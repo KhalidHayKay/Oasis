@@ -12,7 +12,7 @@ export const http = {
 		}
 	},
 
-	post: async <T>(url: string, data?: any): Promise<T> => {
+	post: async <T, D = unknown>(url: string, data?: D): Promise<T> => {
 		try {
 			const res = await api.post(url, data);
 			return res.data;
@@ -22,7 +22,7 @@ export const http = {
 		}
 	},
 
-	put: async <T>(url: string, data?: any): Promise<T> => {
+	put: async <T, D = unknown>(url: string, data?: D): Promise<T> => {
 		try {
 			const res = await api.put(url, data);
 			return res.data;

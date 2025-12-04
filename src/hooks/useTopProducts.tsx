@@ -1,6 +1,6 @@
 'use client';
 
-import { sortType } from '@/view/home/products';
+import { sortType } from '@/components/product/product-catalogue';
 import { useEffect, useState, useCallback } from 'react';
 
 export function useTopProducts(products: Product[]) {
@@ -49,10 +49,13 @@ export function useTopProducts(products: Product[]) {
 
 	useEffect(() => {
 		const sorted = sortProducts(products, sortBy);
-		setDisplayedProducts(
-			sorted.slice(0, Math.max(displayedProducts.length, displaySize))
-		);
-	}, [sortBy, products, sortProducts]);
+
+		queueMicrotask(() => {
+			setDisplayedProducts(
+				sorted.slice(0, Math.max(displayedProducts.length, displaySize))
+			);
+		});
+	}, [sortBy, products, sortProducts, displayedProducts.length]);
 
 	return {
 		displayedProducts,

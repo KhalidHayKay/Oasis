@@ -27,8 +27,6 @@ export const productService = {
 
 		const ep = routes.api.product.all(queryParts.join('&'));
 
-		console.log(ep);
-
 		const res: PaginatedResponse<Product> = await http.get(ep);
 		return res;
 	},

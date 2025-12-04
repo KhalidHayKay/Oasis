@@ -7,16 +7,11 @@ import ProductSortDropdown from '@/components/product/product-sort-dropdown';
 import { useProductSorting } from '@/hooks/useProductSorting';
 import { SlidersHorizontal } from 'lucide-react';
 import ShopFilter from '@/components/shop-filter';
-import {
-	Drawer,
-	DrawerClose,
-	DrawerContent,
-	DrawerTrigger,
-} from '@/components/ui/drawer';
+import { Drawer, DrawerContent, DrawerTrigger } from '@/components/ui/drawer';
 import PopularCategories from './popular-categories';
 
 const ShopView = ({
-	products: { data: products, meta, links },
+	products: { data: products, meta },
 	tags: categories,
 	popularCategories,
 }: {

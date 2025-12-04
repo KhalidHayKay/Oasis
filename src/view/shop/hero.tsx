@@ -1,12 +1,9 @@
-import Crumb from '@/components/crumb';
-import Image from 'next/image';
-
-const links = [
-	{
-		href: '/',
-		title: 'Home',
-	},
-];
+// const links = [
+// 	{
+// 		href: '/',
+// 		title: 'Home',
+// 	},
+// ];
 
 const Hero = () => {
 	return (

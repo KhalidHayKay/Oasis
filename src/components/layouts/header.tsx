@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { ArrowRight, Home, Menu, ShoppingCart } from 'lucide-react';
+import { ArrowRight, Menu, ShoppingCart } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import routes from '@/config/routes';
 import Image from 'next/image';
@@ -14,9 +14,9 @@ export function Header({
 }: {
 	navLinks: { label: string; href: string }[];
 }) {
-	const [toggle, showMenu] = useState(false);
+	// const [toggle, showMenu] = useState(false);
 	const [scrollDepth, setScrollDepth] = useState(0);
-	const [activeNav, setActiveNav] = useState('home');
+	// const [activeNav, setActiveNav] = useState('home');
 
 	const handleWindowScroll = () => {
 		setScrollDepth(window.scrollY);

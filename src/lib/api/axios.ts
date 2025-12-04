@@ -1,11 +1,9 @@
-// api.ts
 import axios, {
 	AxiosInstance,
 	AxiosResponse,
 	InternalAxiosRequestConfig,
 } from 'axios';
 import { getToken, triggerLogout } from './auth';
-import { handleApiError } from './handle-error';
 
 export interface ApiResponse<T> {
 	data: T;

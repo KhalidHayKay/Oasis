@@ -1,7 +1,7 @@
-import axios, { AxiosRequestConfig } from 'axios';
+import { AxiosRequestConfig } from 'axios';
 
-interface CacheItem {
-	data: any;
+interface CacheItem<T = unknown> {
+	data: T;
 	expires: number;
 }
 
@@ -27,7 +27,7 @@ export function getCached(config: AxiosRequestConfig) {
 	return item.data;
 }
 
-export function setCached(config: AxiosRequestConfig, data: any) {
+export function setCached<D = unknown>(config: AxiosRequestConfig, data: D) {
 	if (config.method?.toLowerCase() !== 'get') return;
 	cache.set(getCacheKey(config), { data, expires: Date.now() + TTL });
 }

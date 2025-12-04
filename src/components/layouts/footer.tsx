@@ -1,8 +1,7 @@
 import Link from 'next/link';
-import { Mail, Phone, MapPin, Clock, ArrowUp } from 'lucide-react';
+import { ArrowUp } from 'lucide-react';
 import Image from 'next/image';
 import routes from '@/config/routes';
-import { Button } from '../ui/button';
 import { Fragment } from 'react/jsx-runtime';
 
 export function Footer({

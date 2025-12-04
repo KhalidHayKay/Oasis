@@ -2,7 +2,7 @@
 
 import HorizontalScrollablePill from '@/components/horizontal-scrollable-pills';
 import ProductCatalogue from '@/components/product/product-catalogue';
-import { SetStateAction, useState } from 'react';
+import { useState } from 'react';
 
 interface ProductProps {
 	tags: Tag[];

@@ -26,11 +26,12 @@ const ShopFilter = ({ categories, filterHook }: ShopFilterProps) => {
 		max: filters.max_price || '1000',
 	});
 
-	// Sync local price state with URL params when they change
 	useEffect(() => {
-		setPriceRange({
-			min: filters.min_price || '0',
-			max: filters.max_price || '1000',
+		queueMicrotask(() => {
+			setPriceRange({
+				min: filters.min_price || '0',
+				max: filters.max_price || '1000',
+			});
 		});
 	}, [filters.min_price, filters.max_price]);
 

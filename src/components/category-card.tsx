@@ -1,5 +1,5 @@
 import { Card } from '@/components/ui/card';
-import { ChevronRight, MoveUpRight } from 'lucide-react';
+import { MoveUpRight } from 'lucide-react';
 import Image from 'next/image';
 import routes from '@/config/routes';
 import Link from 'next/link';

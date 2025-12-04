@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import useEmblaCarousel from 'embla-carousel-react';
@@ -11,23 +11,24 @@ const PopularCategories = ({ categories }: { categories: Category[] }) => {
 		align: 'start',
 		skipSnaps: false,
 		dragFree: false,
-		slidesToScroll: 1, // Added slidesToScroll for smooth grouped scrolling - scrolls by 1 slide at a time
+		slidesToScroll: 1,
 	});
 
 	const [canScrollLeft, setCanScrollLeft] = useState(false);
 	const [canScrollRight, setCanScrollRight] = useState(true);
-	const [selectedIndex, setSelectedIndex] = useState(0);
 
-	const onSelect = () => {
+	const onSelect = useCallback(() => {
 		if (!emblaApi) return;
-		setSelectedIndex(emblaApi.selectedScrollSnap());
 		setCanScrollLeft(emblaApi.canScrollPrev());
 		setCanScrollRight(emblaApi.canScrollNext());
-	};
+	}, [emblaApi]);
 
 	useEffect(() => {
 		if (!emblaApi) return;
-		onSelect();
+
+		queueMicrotask(onSelect);
+
+		// Subscribe to events
 		emblaApi.on('select', onSelect);
 		emblaApi.on('reInit', onSelect);
 
@@ -35,12 +36,10 @@ const PopularCategories = ({ categories }: { categories: Category[] }) => {
 			emblaApi.off('select', onSelect);
 			emblaApi.off('reInit', onSelect);
 		};
-	}, [emblaApi]);
+	}, [emblaApi, onSelect]);
 
 	const handlePrev = () => emblaApi?.scrollPrev();
 	const handleNext = () => emblaApi?.scrollNext();
-
-	const totalSlides = categories.length;
 
 	return (
 		<section className='spacing-section'>
