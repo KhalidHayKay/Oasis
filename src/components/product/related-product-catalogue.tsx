@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import ProductCard from '@/components/product-card';
+import ProductCard from '@/components/product/product-card';
 import useEmblaCarousel from 'embla-carousel-react';
 
 const RelatedProductCatalogue = ({ products }: { products: Product[] }) => {
@@ -72,16 +72,17 @@ const RelatedProductCatalogue = ({ products }: { products: Product[] }) => {
 			</div>
 
 			{/* Carousel Container */}
-			<div className='overflow-hidden' ref={emblaRef}>
-				<div className='flex gap-4'>
+			<div className='overflow-hidden p-1' ref={emblaRef}>
+				<div className='h-fit flex gap-4'>
 					{products.map((product) => (
 						<div
 							key={product.id}
-							className='shrink-0 min-w-0 basis-1/2 sm:basis-1/3 lg:basis-1/4'
+							className='h-fit shrink-0 min-w-0 basis-1/2 sm:basis-1/3 lg:basis-1/4'
 						>
-							{' '}
-							{/* Updated responsive breakpoints - 2 items on mobile, 3 on tablet, 4 on desktop */}
-							<ProductCard product={product} />
+							<ProductCard
+								product={product}
+								className='min-h-[150px] sm:min-h-[300px] md:min-h-[450px]'
+							/>
 						</div>
 					))}
 				</div>

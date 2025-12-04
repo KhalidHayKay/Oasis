@@ -1,7 +1,7 @@
 'use client';
 
 import HorizontalScrollablePill from '@/components/horizontal-scrollable-pills';
-import ProductCatalogue from '@/components/product-catalogue';
+import ProductCatalogue from '@/components/product/product-catalogue';
 import { SetStateAction, useState } from 'react';
 
 interface ProductProps {

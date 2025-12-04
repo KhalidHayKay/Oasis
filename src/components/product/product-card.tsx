@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { ArrowRight } from 'lucide-react';
 import Image from 'next/image';
 import { motion, AnimatePresence } from 'motion/react';
-import AppButton from './app-button';
+import AppButton from '../app-button';
 import currency from '@/lib/utils/currency';
 import Link from 'next/link';
 import { cn } from '@/lib/utils';

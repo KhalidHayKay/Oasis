@@ -3,7 +3,7 @@ import Category from './category';
 import FAQ from './faq';
 import { categories, FAQs } from './data';
 import Inspiration from './inspiration';
-import ProductCatalogue from '@/components/product-catalogue';
+import ProductCatalogue from '@/components/product/product-catalogue';
 
 type HomeViewProps = {
 	products: Product[];

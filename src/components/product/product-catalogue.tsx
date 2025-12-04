@@ -9,7 +9,9 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from '@/components/ui/select';
-import ProductCard, { ProductCardSkeleton } from '@/components/product-card';
+import ProductCard, {
+	ProductCardSkeleton,
+} from '@/components/product/product-card';
 import { useTopProducts } from '@/hooks/useTopProducts';
 import { cn } from '@/lib/utils';
 

@@ -3,7 +3,7 @@ import { Input } from '@/components/ui/input';
 import routes from '@/config/routes';
 import { Search } from 'lucide-react';
 
-const Hero = ({ category }: { category: string }) => {
+const Hero = ({ category, desc }: { category: string; desc: string }) => {
 	const links = [
 		{
 			href: routes.page.home,
@@ -20,10 +20,7 @@ const Hero = ({ category }: { category: string }) => {
 			<h1 className='text-balance mt-5 tracking-tight text-slate-900 text-3xl sm:text-4xl md:text-5xl font-semibold lg:max-w-5xl mx-auto'>
 				{category}
 			</h1>
-			<p className='my-6 text-lg sm:text-lg text-slate-600'>
-				Experience the elegance and functionality of cutting-edge design where
-				luxury meets innovation in every piece for ultimate relaxation
-			</p>
+			<p className='my-6 text-lg sm:text-lg text-slate-600'>{desc}</p>
 			<Crumb links={links} page={category} />
 			<div className='w-3/4 max-w-3xl relative'>
 				<Input

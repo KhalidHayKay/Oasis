@@ -1,25 +1,24 @@
-import { categories } from '@/view/home/data';
-import { all } from 'axios';
-import { view } from 'motion/react-client';
-import { Inspiration } from 'next/font/google';
-
 const routes = {
 	page: {
 		home: '/',
 		shop: '/shop',
 		categories: {
 			all: '/categories',
-			view: (category: string) => `/categories/${category}`,
+			view: (slug: string) => `/categories/${slug}`,
 		},
 		blog: '/blog',
 	},
 	api: {
 		category: {
-			all: 'api/categories',
+			all: (query?: string) => `api/categories?${query}`,
 			content: (slug: string) => `api/categories/${slug}`,
+		},
+		tag: {
+			all: '/api/tags',
 		},
 		product: {
 			top: 'api/products/top',
+			all: (query: string) => `api/products?${query}`,
 			details: (slug: string) => `api/products/${slug}`,
 		},
 		Inspiration: {
