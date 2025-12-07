@@ -8,7 +8,7 @@ interface PageProps {
 }
 
 const product = async (params: PageProps) => {
-	const { slug } = params.params;
+	const { slug } = await params.params;
 
 	const data = await productService.details(slug);
 

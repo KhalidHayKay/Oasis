@@ -81,7 +81,7 @@ const ProductCard = ({ product, className }: ProductCardProps) => {
 	return (
 		<div
 			className={cn(
-				'flex flex-col min-h-[200px] sm:min-h-[350px] md:min-h-[500px]',
+				'flex flex-col gap-y-1 min-h-[200px] sm:min-h-[350px] md:min-h-[500px]',
 				className
 			)}
 		>

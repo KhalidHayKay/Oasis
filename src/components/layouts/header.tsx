@@ -1,22 +1,33 @@
 'use client';
 
 import Link from 'next/link';
-import { ArrowRight, Menu, ShoppingCart } from 'lucide-react';
+import { Bell, ShoppingBag, Sofa } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import routes from '@/config/routes';
-import Image from 'next/image';
 import { useEffect, useState } from 'react';
 import { cn } from '@/lib/utils';
-import AppButton from '../app-button';
+import { usePathname } from 'next/navigation';
+import AppUser from './app-user';
 
 export function Header({
 	navLinks,
 }: {
 	navLinks: { label: string; href: string }[];
 }) {
-	// const [toggle, showMenu] = useState(false);
+	const pathname = usePathname();
+
 	const [scrollDepth, setScrollDepth] = useState(0);
-	// const [activeNav, setActiveNav] = useState('home');
+
+	const isLoggedIn = false;
+	const user = {
+		name: 'John Doe',
+		email: 'john@example.com',
+		avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=user',
+	};
+
+	const activeNav =
+		navLinks.find((link) => pathname === link.href)?.label ||
+		navLinks[0]?.label ||
+		'home';
 
 	const handleWindowScroll = () => {
 		setScrollDepth(window.scrollY);
@@ -33,48 +44,83 @@ export function Header({
 	return (
 		<header
 			className={cn(
-				'fixed top-0 left-0 z-50 w-full bg-white',
-				scrollDepth >= 80 ? 'border-b border-grey-100 transition-colors' : ''
+				'fixed top-0 z-50 w-full bg-white transition-all duration-200',
+				scrollDepth >= 80 ? 'border-b border-grey-100 shadow-sm' : ''
 			)}
 		>
-			<div className='flex items-center justify-between p-2 sm:px-6 sm:py-4 lg:px-12 lg:py-5'>
-				<Link
-					href={routes.page.home}
-					className='text-2xl font-bold italic text-grey-800'
-				>
-					<Image src={'/images/logo.png'} alt={'App Logo'} width={60} height={50} />
-				</Link>
+			<div className='px-2 sm:px-6 lg:px-12'>
+				<div className='flex items-center justify-between h-16 lg:h-20'>
+					{/* Logo */}
+					<div className='flex items-center gap-2 text-grey-800'>
+						<Sofa className='w-5 h-5 lg:w-6 lg:h-6' />
+						<h1 className='text-lg lg:text-xl font-semibold'>Oasis</h1>
+					</div>
 
-				<nav className='hidden items-center gap-8 lg:flex'>
+					{/* Navigation - Hidden on mobile, shown on md+ */}
+					<nav className='hidden md:flex items-center gap-8 absolute left-1/2 -translate-x-1/2'>
+						{navLinks.map((link, i) => (
+							<Link
+								key={i}
+								href={link.href}
+								className={cn(
+									'text-sm font-medium transition-colors hover:text-grey-900 relative',
+									activeNav.toLowerCase() === link.label.toLowerCase()
+										? 'text-grey-900'
+										: 'text-grey-500'
+								)}
+							>
+								{link.label.toUpperCase()}
+								{activeNav.toLowerCase() === link.label.toLowerCase() && (
+									<span className='absolute -bottom-1 left-0 right-0 h-0.5 bg-grey-900' />
+								)}
+							</Link>
+						))}
+					</nav>
+
+					{/* Right side actions */}
+					<div className='flex items-center gap-3 lg:gap-4'>
+						{isLoggedIn && (
+							<button className='relative p-2 hover:bg-grey-50 rounded-lg transition-colors'>
+								<Bell className='w-5 h-5 text-grey-700' />
+								<span className='absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full border-2 border-white'></span>
+							</button>
+						)}
+
+						<Button
+							variant='outline'
+							size='sm'
+							className='gap-2 rounded-full border-grey-300 text-grey-700 hover:bg-grey-50 hover:text-grey-900 hover:border-grey-400'
+						>
+							<span className='hidden sm:inline text-xs font-medium tracking-wide'>
+								MY CART
+							</span>
+							<ShoppingBag className='w-4 h-4' />
+						</Button>
+
+						<AppUser isLoggedIn={isLoggedIn} user={user} />
+					</div>
+				</div>
+
+				{/* Mobile navigation */}
+				<nav className='md:hidden flex items-center gap-6 pb-3 border-t border-grey-100 pt-3'>
 					{navLinks.map((link, i) => (
 						<Link
 							key={i}
 							href={link.href}
-							className='text-sm font-medium text-grey-700 hover:text-grey-900'
+							className={cn(
+								'text-sm font-medium transition-colors relative',
+								activeNav.toLowerCase() === link.label.toLowerCase()
+									? 'text-grey-900'
+									: 'text-grey-500'
+							)}
 						>
-							{link.label}
+							{link.label.toUpperCase()}
+							{activeNav.toLowerCase() === link.label.toLowerCase() && (
+								<span className='absolute -bottom-3 left-0 right-0 h-0.5 bg-grey-900' />
+							)}
 						</Link>
 					))}
 				</nav>
-
-				<div className='flex items-center gap-4'>
-					<button className='relative size-7 sm:size-10 rounded-full flex items-center justify-center bg-brand-50 text-grey-700 hover:bg-brand-100 transition-colors cursor-pointer'>
-						<ShoppingCart className='size-3.5 sm:size-5' />
-
-						<span className='absolute -right-0.5 sm:-right-1 top-0 flex size-2.5 sm:size-4 items-center justify-center rounded-full bg-brandRed text-[10px] sm:text-xs text-white'>
-							2
-						</span>
-					</button>
-					<AppButton>
-						Get Started <ArrowRight className='h-4 w-4' />
-					</AppButton>
-					<Button
-						variant='outline'
-						className='size-7 sm:size-10 cursor-pointer lg:hidden'
-					>
-						<Menu className='size-4' />
-					</Button>
-				</div>
 			</div>
 		</header>
 	);

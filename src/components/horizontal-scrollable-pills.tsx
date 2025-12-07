@@ -8,7 +8,7 @@ const HorizontalScrollablePill = ({
 	active,
 }: HorizontalScrollablePillProps) => {
 	return (
-		<div className='relative -mx-4 px-4 sm:mx-0 sm:px-0'>
+		<div className='relative sm:mx-0 sm:px-0'>
 			<div className='flex gap-3 overflow-x-auto scrollbar-hide pb-2 snap-x snap-mandatory'>
 				{categories.map((category) => (
 					<button

@@ -45,15 +45,14 @@ export default function RootLayout({
 	];
 
 	return (
-		<html lang='en'>
+		<html lang='en' className={`${_geist.className} ${_geistMono.className}`}>
 			<body className={`font-sans antialiased`}>
-				{/* <CHANGE> Added Header component */}
 				<Header navLinks={navLinks} />
 
-				{/* Main content */}
-				<main className='bg-white pt-20 px-2 sm:px-6 lg:px-12'>{children}</main>
+				<main className='bg-white pt-30 md:pt-20 px-2 sm:px-6 lg:px-12'>
+					{children}
+				</main>
 
-				{/* <CHANGE> Added Footer component */}
 				<Footer navLinks={navLinks} />
 			</body>
 		</html>

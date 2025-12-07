@@ -2,7 +2,7 @@ import Image from 'next/image';
 
 const Hero = () => {
 	return (
-		<section className='pt-2 sm:pt-6 lg:pt-16'>
+		<section className='pt-5 sm:pt-10 lg:pt-16'>
 			<div className='text-center'>
 				<p className='text-sm sm:text-xl font-bold uppercase tracking-widest text-primary/80'>
 					Furniture Store
