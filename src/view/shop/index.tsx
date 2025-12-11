@@ -41,7 +41,7 @@ const ShopView = ({
 									<SlidersHorizontal className='size-4' />
 									<span className='font-medium'>Filters</span>
 								</DrawerTrigger>
-								<DrawerContent className='overflow-y-auto'>
+								<DrawerContent className='overflow-y-auto scrollbar-hide'>
 									<ShopFilter filterHook={filterHook} categories={categories} />
 								</DrawerContent>
 							</Drawer>
