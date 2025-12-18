@@ -5,15 +5,14 @@ import {
 	Drawer,
 	DrawerClose,
 	DrawerContent,
-	DrawerDescription,
 	DrawerFooter,
 	DrawerHeader,
 	DrawerTitle,
 	DrawerTrigger,
 } from '@/components/ui/drawer';
 import { useCart } from '@/hooks/useCart';
-import Image from 'next/image';
 import CartProduct from '@/components/cart-product';
+import { AppDrawer } from '@/components/app-drawer';
 
 interface DetailProps {
 	product: ProductDetails;
@@ -28,6 +27,8 @@ const Detail = ({ product }: DetailProps) => {
 	const { name, description, price, rating, colors, featuredImage } = product;
 
 	const discountedPrice = Math.round(price.amount * (1 - price.discount / 100));
+
+	const handleCheckout = () => console.log('object');
 
 	return (
 		<div className='flex-1 flex flex-col gap-6'>
@@ -119,47 +120,32 @@ const Detail = ({ product }: DetailProps) => {
 			</div>
 
 			{/* CTA Button */}
-			<Drawer direction='right'>
-				<DrawerTrigger
-					className='w-full bg-brand-700 hover:bg-brand-800 text-white font-semibold py-3 text-lg rounded-full'
-					onClick={() => add(product)}
-				>
-					Add to Cart
-				</DrawerTrigger>
-				<DrawerContent className='min-w-full md:min-w-3/4 lg:min-w-1/2'>
-					<DrawerClose className='w-fit absolute top-7 left-5'>
-						<div className='size-8 flex items-center justify-center rounded-full bg-grey-200/20 hover:bg-grey-200/50'>
-							<X className='text-foreground size-4' />
-						</div>
-					</DrawerClose>
-					<div className='py-5 px-5 sm:px-15 xl:px-30 w-full'>
-						<DrawerHeader className='flex-row justify-center'>
-							<DrawerTitle className='text-2xl font-semibold'>cart</DrawerTitle>
-						</DrawerHeader>
-						<div className='mt-15 -mb-5 h-[calc(100vh-200px)]'>
-							<div className='pt-2 flex flex-col gap-y-10 overflow-y-auto min-h-full max-h-full scrollbar-hide'>
-								{items.map((item, index) => (
-									<CartProduct
-										key={`${item.id}-${index}`}
-										name={name}
-										description={description}
-										price={discountedPrice}
-										colors={colors}
-										selectedColor={selectedColor}
-										image={featuredImage}
-										quantity={quantity}
-									/>
-								))}
-							</div>
-						</div>
-					</div>
-					<DrawerFooter className='absolute bottom-0 left-0 w-full h-12 p-0'>
-						<Button className='size-full bg-brand-700 hover:bg-brand-800 rounded-none py-4'>
-							Next
-						</Button>
-					</DrawerFooter>
-				</DrawerContent>
-			</Drawer>
+			<AppDrawer
+				trigger={
+					<button className='w-full bg-brand-700 hover:bg-brand-800 text-white font-semibold py-3 text-lg rounded-full'>
+						Add to Cart
+					</button>
+				}
+				title='cart'
+				onTriggerClick={() => add(product)}
+				footerButton={{
+					label: 'Next',
+					onClick: handleCheckout,
+				}}
+			>
+				{items.map((item, index) => (
+					<CartProduct
+						key={`${item.id}-${index}`}
+						name={name}
+						description={description}
+						price={discountedPrice}
+						colors={colors}
+						selectedColor={selectedColor}
+						image={featuredImage}
+						quantity={quantity}
+					/>
+				))}
+			</AppDrawer>
 
 			{/* Additional Info */}
 			<div className='flex flex-col gap-3 text-foreground text-sm sm:text-base'>

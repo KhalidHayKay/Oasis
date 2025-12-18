@@ -9,6 +9,10 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { LogOut, Package, Settings, User } from 'lucide-react';
 import { Button } from '../ui/button';
+import { AppDrawer } from '../app-drawer';
+import { SignupForm } from '../auth/signup';
+import { LoginForm } from '../auth/login';
+import { AuthDrawer } from '../auth/auth-drawer';
 
 export default function AppUser({
 	isLoggedIn,
@@ -17,6 +21,8 @@ export default function AppUser({
 	isLoggedIn: boolean;
 	user: User;
 }) {
+	const handleLogin = () => console.log('login');
+
 	return (
 		<>
 			{isLoggedIn ? (
@@ -59,12 +65,18 @@ export default function AppUser({
 					</DropdownMenuContent>
 				</DropdownMenu>
 			) : (
-				<Button
-					size='sm'
-					className='bg-brand-800 text-white hover:bg-brand-700 rounded-full'
-				>
-					Get Started
-				</Button>
+				<AuthDrawer
+					trigger={
+						<Button
+							size='sm'
+							className='bg-brand-800 text-white hover:bg-brand-700 rounded-full'
+						>
+							Get Started
+						</Button>
+					}
+					defaultView='login'
+					onSuccess={() => console.log('Logged in!')}
+				/>
 			)}
 		</>
 	);
