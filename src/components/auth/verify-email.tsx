@@ -1,7 +1,6 @@
-// components/auth/VerifyEmailForm.tsx
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
@@ -16,13 +15,13 @@ import {
 import {
 	InputOTP,
 	InputOTPGroup,
-	InputOTPSeparator,
 	InputOTPSlot,
 } from '@/components/ui/input-otp';
-import { Input } from '@/components/ui/input';
-// import { authService } from '@/services/authService';
-import { Loader2, Mail } from 'lucide-react';
-// import { useToast } from '@/hooks/use-toast';
+import { Loader2 } from 'lucide-react';
+import { useAuthStore } from '@/store/useAuthStore';
+import { toast } from 'sonner';
+import { REGEXP_ONLY_DIGITS } from 'input-otp';
+import { authService } from '@/services/authService';
 
 const verifySchema = z.object({
 	code: z.string().length(6, 'Code must be 6 digits'),
@@ -33,17 +32,12 @@ type VerifyFormValues = z.infer<typeof verifySchema>;
 interface VerifyEmailFormProps {
 	email: string;
 	onSuccess?: () => void;
-	onBack?: () => void;
 }
 
-export function VerifyEmailForm({
-	email,
-	onSuccess,
-	onBack,
-}: VerifyEmailFormProps) {
-	const [isLoading, setIsLoading] = useState(false);
+export function VerifyEmailForm({ email, onSuccess }: VerifyEmailFormProps) {
 	const [isResending, setIsResending] = useState(false);
-	//   const { toast } = useToast();
+
+	const verify = useAuthStore((state) => state.verifyEmail);
 
 	const form = useForm<VerifyFormValues>({
 		resolver: zodResolver(verifySchema),
@@ -53,46 +47,49 @@ export function VerifyEmailForm({
 	});
 
 	const onSubmit = async (data: VerifyFormValues) => {
-		setIsLoading(true);
-		// try {
-		//   const response = await authService.verifyEmail({
-		//     email,
-		//     code: data.code,
-		//   });
-		//   toast({
-		//     title: 'Success',
-		//     description: response.message || 'Email verified successfully!',
-		//   });
-		//   onSuccess?.();
-		// } catch (error: any) {
-		//   toast({
-		//     title: 'Error',
-		//     description: error.message || 'Verification failed. Please check your code.',
-		//     variant: 'destructive',
-		//   });
-		// } finally {
-		//   setIsLoading(false);
-		// }
+		const verData = { email, code: data.code };
+
+		try {
+			const res = await verify(verData);
+			toast.success(res.message || 'Email verified successfully!');
+			onSuccess?.();
+		} catch (error: any) {
+			toast.error(error.message || 'Verification failed. Please check your code.');
+		}
 	};
 
 	const handleResendCode = async () => {
 		setIsResending(true);
-		// try {
-		//   const response = await authService.sendVerificationCode(email);
-		//   toast({
-		//     title: 'Success',
-		//     description: response.message || 'Verification code sent!',
-		//   });
-		// } catch (error: any) {
-		//   toast({
-		//     title: 'Error',
-		//     description: error.message || 'Failed to resend code.',
-		//     variant: 'destructive',
-		//   });
-		// } finally {
-		//   setIsResending(false);
-		// }
+		try {
+			const response = await authService.sendVerificationCode(email);
+			toast(response.message || 'Verification code sent!');
+		} catch (error: any) {
+			toast.error(error.message || 'Failed to resend code.');
+		} finally {
+			setIsResending(false);
+		}
 	};
+
+	const hasSubmittedRef = useRef(false);
+	const code = form.watch('code');
+
+	useEffect(() => {
+		if (
+			code?.length === 6 &&
+			!form.formState.isSubmitting &&
+			!hasSubmittedRef.current
+		) {
+			hasSubmittedRef.current = true;
+			form.handleSubmit(onSubmit)();
+		}
+	}, [code]);
+
+	useEffect(() => {
+		if (code?.length < 6) {
+			hasSubmittedRef.current = false;
+			form.clearErrors('code');
+		}
+	}, [code]);
 
 	return (
 		<div className='space-y-6 sm:px-10'>
@@ -117,32 +114,20 @@ export function VerifyEmailForm({
 						render={({ field }) => (
 							<FormItem>
 								<FormControl>
-									<InputOTP maxLength={6} pattern={''}>
+									<InputOTP
+										maxLength={6}
+										pattern={REGEXP_ONLY_DIGITS}
+										value={field.value}
+										onChange={field.onChange}
+									>
 										<InputOTPGroup className='w-full px-1 flex justify-between gap-x-3'>
-											<InputOTPSlot
-												index={0}
-												className='size-10 sm:size-12 focus:ring-brand-800'
-											/>
-											<InputOTPSlot
-												index={1}
-												className='size-10 sm:size-12 focus:ring-brand-800'
-											/>
-											<InputOTPSlot
-												index={2}
-												className='size-10 sm:size-12 focus:ring-brand-800'
-											/>
-											<InputOTPSlot
-												index={3}
-												className='size-10 sm:size-12 focus:ring-brand-800'
-											/>
-											<InputOTPSlot
-												index={4}
-												className='size-10 sm:size-12 focus:ring-brand-800'
-											/>
-											<InputOTPSlot
-												index={5}
-												className='size-10 sm:size-12 focus:ring-brand-800'
-											/>
+											{Array.from({ length: 6 }).map((_, i) => (
+												<InputOTPSlot
+													key={i}
+													index={i}
+													className='size-10 sm:size-12 focus:ring-brand-800'
+												/>
+											))}
 										</InputOTPGroup>
 									</InputOTP>
 								</FormControl>
@@ -153,10 +138,10 @@ export function VerifyEmailForm({
 
 					<Button
 						type='submit'
-						disabled={isLoading}
+						disabled={form.formState.isSubmitting}
 						className='w-full h-12 bg-brand-700 hover:bg-brand-800 text-white rounded-full'
 					>
-						{isLoading ? (
+						{form.formState.isSubmitting ? (
 							<>
 								<Loader2 className='mr-2 h-4 w-4 animate-spin' />
 								Verifying...

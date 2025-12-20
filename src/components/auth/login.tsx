@@ -19,7 +19,7 @@ import { toast } from 'sonner';
 
 const loginSchema = z.object({
 	email: z.email('Invalid email address').max(255, 'Email is too long'),
-	password: z.string().min(8, 'Password must be at least 8 characters'),
+	password: z.string().min(6, 'Password must be at least 6 characters'),
 });
 
 type LoginFormValues = z.infer<typeof loginSchema>;
@@ -47,8 +47,8 @@ export function LoginForm({
 
 	const onSubmit = async (credentials: LoginFormValues) => {
 		try {
-			await login(credentials);
-			toast.success('Login successful');
+			const res = await login(credentials);
+			toast.success(res.message || 'Login successful');
 			onSuccess();
 		} catch (error: any) {
 			toast.error(error.message || 'Registration failed. Please try again.');
@@ -56,7 +56,7 @@ export function LoginForm({
 	};
 
 	return (
-		<div className='space-y-6 px-10'>
+		<div className='space-y-6 sm:px-10'>
 			<div className='space-y-2'>
 				<div className='size-[150px] mx-auto mb-4'>
 					<img

@@ -5,28 +5,27 @@ interface AuthState {
 	// State
 	user: User | null;
 	isAuthenticated: boolean;
-	isLoading: boolean;
+	isInitiatingAuth: boolean;
 
 	// Actions
-	login: (credentials: LoginCredentials) => Promise<void>;
-	register: (data: RegistrationData) => Promise<void>;
-	//   verifyEmail: (data: VerifyEmailRequest) => Promise<void>;
-	//   sendVerificationCode: (email: string) => Promise<void>;
-	//   socialLogin: (provider: 'google' | 'apple') => Promise<void>;
-	logout: () => Promise<void>;
+	login: (credentials: LoginCredentials) => Promise<AuthResponse>;
+	register: (data: RegistrationData) => Promise<AuthResponse>;
+	verifyEmail: (data: VerifyEmailRequest) => Promise<AuthResponse>;
+	//   sendVerificationCode: (email: string) => Promise<AuthResponse>;
+	//   socialLogin: (provider: 'google' | 'apple') => Promise<AuthResponse>;
+	logout: () => Promise<string>;
 	initializeAuth: () => Promise<void>;
 }
 
 export const useAuthStore = create<AuthState>((set, get) => ({
 	// Initial state
 	user: null,
-	token: null,
 	isAuthenticated: false,
-	isLoading: true,
-	error: null,
+	isInitiatingAuth: true,
+	message: null,
 
 	initializeAuth: async () => {
-		set({ isLoading: true });
+		set({ isInitiatingAuth: true });
 		try {
 			const user = await authService.getUser();
 			if (user) {
@@ -35,9 +34,9 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 				set({ isAuthenticated: false });
 			}
 
-			set({ isLoading: false });
+			set({ isInitiatingAuth: false });
 		} catch (error) {
-			set({ isAuthenticated: false, isLoading: false });
+			set({ isAuthenticated: false, isInitiatingAuth: false });
 		}
 	},
 
@@ -48,6 +47,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 				user: response.user,
 				isAuthenticated: true,
 			});
+			return response;
 		} catch (error: unknown) {
 			throw error;
 		}
@@ -60,6 +60,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 				user: response.user,
 				isAuthenticated: true,
 			});
+			return response;
 		} catch (error: any) {
 			throw error;
 		}
@@ -72,27 +73,11 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 				user: response.user,
 				isAuthenticated: true,
 			});
+			return response;
 		} catch (error: any) {
 			throw error;
 		}
 	},
-
-	//   sendVerificationCode: async (email) => {
-	//     set({ isLoading: true, error: null });
-	//     try {
-	//       await authService.sendVerificationCode(email);
-	//       set({
-	//         isLoading: false,
-	//         error: null,
-	//       });
-	//     } catch (error: any) {
-	//       set({
-	//         isLoading: false,
-	//         error: error.message || 'Failed to send code',
-	//       });
-	//       throw error;
-	//     }
-	//   },
 
 	//   socialLogin: async (provider) => {
 	//     set({ isLoading: true, error: null });
@@ -115,16 +100,17 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 	//   },
 
 	logout: async () => {
-		set({ isLoading: true });
+		set({ isInitiatingAuth: true });
 		try {
-			await authService.logout();
+			const response = await authService.logout();
+			return response.message;
 		} catch (error) {
-			console.error('Logout error:', error);
+			throw error;
 		} finally {
 			set({
 				user: null,
 				isAuthenticated: false,
-				isLoading: false,
+				isInitiatingAuth: false,
 			});
 		}
 	},

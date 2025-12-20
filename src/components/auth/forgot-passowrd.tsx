@@ -24,7 +24,7 @@ const forgotPasswordSchema = z.object({
 type ForgotPasswordFormValues = z.infer<typeof forgotPasswordSchema>;
 
 interface ForgotPasswordFormProps {
-	onSuccess?: () => void;
+	onSuccess?: (userEmail: string, token: string) => void;
 	onBack?: () => void;
 }
 

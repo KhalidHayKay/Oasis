@@ -12,7 +12,7 @@ import { X } from 'lucide-react';
 import { ReactNode } from 'react';
 
 interface AppDrawerProps {
-	trigger: ReactNode;
+	trigger?: ReactNode;
 	title: string;
 	children: ReactNode;
 	footerButton?: {

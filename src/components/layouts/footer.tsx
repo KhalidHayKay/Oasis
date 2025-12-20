@@ -3,6 +3,7 @@ import { ArrowUp } from 'lucide-react';
 import Image from 'next/image';
 import routes from '@/config/routes';
 import { Fragment } from 'react/jsx-runtime';
+import Logo from '../logo';
 
 export function Footer({
 	navLinks,
@@ -14,17 +15,8 @@ export function Footer({
 			<div className='px-10 py-20 sm:px-10 lg:px-20'>
 				<div className='grid gap-x-20 md:grid-cols-[auto_auto_auto_auto] items-end'>
 					<div className='flex flex-col gap-y-15 md:gap-y-30'>
-						<Link
-							href={routes.page.home}
-							className='text-2xl font-bold italic text-grey-800'
-						>
-							<Image
-								src={'/images/logo.png'}
-								alt={'App Logo'}
-								width={60}
-								height={50}
-							/>
-						</Link>
+						<Logo />
+
 						<nav className=''>
 							<p className='flex flex-wrap max-w-40'>
 								{navLinks.map((link, i) => (

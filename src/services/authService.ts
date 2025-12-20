@@ -18,11 +18,21 @@ export const authService = {
 	},
 
 	async verifyEmail(data: VerifyEmailRequest) {
-		const res: AuthResponse = await http.post(routes.api.auth.register, data);
+		const res: AuthResponse = await http.post(routes.api.auth.email.verify, data);
+		return res;
+	},
+
+	async sendVerificationCode(email: string) {
+		const res: { message: string } = await http.post(
+			routes.api.auth.email.sendCode,
+			{ email }
+		);
 		return res;
 	},
 
 	async logout() {
-		await http.post(routes.api.auth.logout);
+		const res: { message: string } = await http.post(routes.api.auth.logout);
+
+		return res;
 	},
 };

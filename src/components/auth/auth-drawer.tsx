@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { AppDrawer } from '@/components/app-drawer';
 import { LoginForm } from '@/components/auth/login';
 import { SignupForm } from '@/components/auth/signup';
@@ -16,29 +16,41 @@ type AuthView =
 	| 'reset-password';
 
 interface AuthDrawerProps {
-	trigger: React.ReactNode;
+	open: boolean;
+	onOpenChange: (open: boolean) => void;
 	defaultView?: AuthView;
 	onSuccess?: () => void;
+	userEmail?: string; // Pass user email for verify-email view
 }
 
 export function AuthDrawer({
-	trigger,
+	open,
+	onOpenChange,
 	defaultView = 'login',
 	onSuccess,
+	userEmail = '',
 }: AuthDrawerProps) {
-	const [isOpen, setIsOpen] = useState(false);
 	const [currentView, setCurrentView] = useState<AuthView>(defaultView);
-	const [email, setEmail] = useState('');
+	const [email, setEmail] = useState(userEmail);
 	const [resetToken, setResetToken] = useState('');
 
+	// Update view when defaultView changes (e.g., when opening to verify-email)
+	useEffect(() => {
+		if (open) {
+			setCurrentView(defaultView);
+			// Set email if provided (for verify-email from dropdown)
+			if (userEmail) {
+				setEmail(userEmail);
+			}
+		}
+	}, [open, defaultView, userEmail]);
+
 	const handleClose = () => {
-		setIsOpen(false);
-		setTimeout(() => setCurrentView(defaultView), 300);
+		onOpenChange(false);
 	};
 
 	const handleSuccess = () => {
 		onSuccess?.();
-		handleClose();
 	};
 
 	const getTitle = () => {
@@ -87,13 +99,11 @@ export function AuthDrawer({
 			case 'forgot-password':
 				return (
 					<ForgotPasswordForm
-						// onSuccess={(userEmail: string) => {
-						// 	setEmail(userEmail);
-						// In a real app, you'd get the token from email
-						// For now, we'll assume the user follows the email link
-						// which would open the app with the token in the URL
-						// 	setCurrentView('login');
-						// }}
+						onSuccess={(userEmail: string, token: string) => {
+							setEmail(userEmail);
+							setResetToken(token);
+							setCurrentView('reset-password');
+						}}
 						onBack={() => setCurrentView('login')}
 					/>
 				);
@@ -103,21 +113,23 @@ export function AuthDrawer({
 					<ResetPasswordForm
 						email={email}
 						token={resetToken}
-						onSuccess={() => setCurrentView('login')}
+						onSuccess={() => {
+							setCurrentView('login');
+							// Optional: show success toast
+						}}
 					/>
 				);
 
 			default:
-				return null;
+				return <span>No auth content set</span>;
 		}
 	};
 
 	return (
 		<AppDrawer
-			trigger={trigger}
 			title={getTitle()}
-			open={isOpen}
-			onOpenChange={setIsOpen}
+			open={open}
+			onOpenChange={onOpenChange}
 			onClose={handleClose}
 		>
 			{renderContent()}

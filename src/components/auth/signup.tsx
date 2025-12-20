@@ -62,9 +62,9 @@ export function SignupForm({
 
 	const onSubmit = async (data: SignupFormValues) => {
 		try {
-			await signup(data);
+			const res = await signup(data);
 			onNeedVerification(data.email);
-			toast.success('Reg successful');
+			toast.success(res.message || 'Reg successful');
 		} catch (error: any) {
 			onNeedVerification(data.email);
 			toast.error(error.message || 'Registration failed. Please try again.');
@@ -72,7 +72,7 @@ export function SignupForm({
 	};
 
 	return (
-		<div className='space-y-6 px-10'>
+		<div className='space-y-6 sm:px-10'>
 			<div className='space-y-2'>
 				<div className='size-[150px] mx-auto mb-4'>
 					<img

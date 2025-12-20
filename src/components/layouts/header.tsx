@@ -9,6 +9,7 @@ import { usePathname } from 'next/navigation';
 import AppUser from './app-user';
 import { useAuthStore } from '@/store/useAuthStore';
 import { Skeleton } from '../ui/skeleton';
+import Logo from '../logo';
 
 export function Header({
 	navLinks,
@@ -19,7 +20,7 @@ export function Header({
 
 	const [scrollDepth, setScrollDepth] = useState(0);
 
-	const isLoading = useAuthStore((store) => store.isLoading);
+	const isInitiatingAuth = useAuthStore((store) => store.isInitiatingAuth);
 	const user = useAuthStore((store) => store.user);
 	const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
 
@@ -50,11 +51,7 @@ export function Header({
 		>
 			<div className='px-2 sm:px-6 lg:px-12'>
 				<div className='flex items-center justify-between h-16 lg:h-20'>
-					{/* Logo */}
-					<div className='flex items-center gap-2 text-grey-800'>
-						<Sofa className='w-5 h-5 lg:w-6 lg:h-6' />
-						<h1 className='text-lg lg:text-xl font-semibold'>Oasis</h1>
-					</div>
+					<Logo />
 
 					{/* Navigation - Hidden on mobile, shown on md+ */}
 					<nav className='hidden md:flex items-center gap-8 absolute left-1/2 -translate-x-1/2'>
@@ -79,13 +76,6 @@ export function Header({
 
 					{/* Right side actions */}
 					<div className='flex items-center gap-3 lg:gap-4'>
-						{isAuthenticated && (
-							<button className='relative p-2 hover:bg-grey-50 rounded-lg transition-colors'>
-								<Bell className='w-5 h-5 text-grey-700' />
-								<span className='absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full border-2 border-white'></span>
-							</button>
-						)}
-
 						<Button
 							variant='outline'
 							size='sm'
@@ -97,7 +87,7 @@ export function Header({
 							<ShoppingBag className='w-4 h-4' />
 						</Button>
 
-						{isLoading ? (
+						{isInitiatingAuth ? (
 							<Skeleton className='w-8 h-8 rounded-full bg-brand-100' />
 						) : (
 							<AppUser isAuthenticated={isAuthenticated} user={user} />
