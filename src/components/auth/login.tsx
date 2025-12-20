@@ -1,6 +1,5 @@
 'use client';
 
-import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
@@ -13,32 +12,20 @@ import {
 	FormMessage,
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import { Checkbox } from '@/components/ui/checkbox';
-// import { authService } from '@/services/authService';
-// import { useAuth } from '@/contexts/AuthContext';
 import { Loader2 } from 'lucide-react';
 import Social from './social';
-// import { useToast } from '@/hooks/use-toast';
+import { useAuthStore } from '@/store/useAuthStore';
+import { toast } from 'sonner';
 
-const loginSchema = z
-	.object({
-		name: z.string().min(1, 'Name is required').max(255, 'Name is too long'),
-		email: z.email('Invalid email address').max(255, 'Email is too long'),
-		password: z.string().min(8, 'Password must be at least 8 characters'),
-		password_confirmation: z.string(),
-		terms: z.boolean().refine((val) => val === true, {
-			message: 'You must accept the terms and conditions',
-		}),
-	})
-	.refine((data) => data.password === data.password_confirmation, {
-		message: "Passwords don't match",
-		path: ['password_confirmation'],
-	});
+const loginSchema = z.object({
+	email: z.email('Invalid email address').max(255, 'Email is too long'),
+	password: z.string().min(8, 'Password must be at least 8 characters'),
+});
 
 type LoginFormValues = z.infer<typeof loginSchema>;
 
 interface LoginFormProps {
-	onSuccess?: () => void;
+	onSuccess: () => void;
 	onSwitchToSignup?: () => void;
 	onForgotPassword?: () => void;
 }
@@ -48,9 +35,7 @@ export function LoginForm({
 	onSwitchToSignup,
 	onForgotPassword,
 }: LoginFormProps) {
-	const [isLoading, setIsLoading] = useState(false);
-	// const { setUser } = useAuth();
-	// const { toast } = useToast();
+	const login = useAuthStore((state) => state.login);
 
 	const form = useForm<LoginFormValues>({
 		resolver: zodResolver(loginSchema),
@@ -60,26 +45,14 @@ export function LoginForm({
 		},
 	});
 
-	const onSubmit = async (data: LoginFormValues) => {
-		// setIsLoading(true);
-		// try {
-		// 	const response = await authService.register(data);
-		// 	setUser(response.user);
-		// 	toast({
-		// 		title: 'Success',
-		// 		description: response.message,
-		// 	});
-		// 	// Navigate to email verification
-		// 	onNeedVerification?.(data.email);
-		// } catch (error: any) {
-		// 	toast({
-		// 		title: 'Error',
-		// 		description: error.message || 'Registration failed. Please try again.',
-		// 		variant: 'destructive',
-		// 	});
-		// } finally {
-		// 	setIsLoading(false);
-		// }
+	const onSubmit = async (credentials: LoginFormValues) => {
+		try {
+			await login(credentials);
+			toast.success('Login successful');
+			onSuccess();
+		} catch (error: any) {
+			toast.error(error.message || 'Registration failed. Please try again.');
+		}
 	};
 
 	return (
@@ -144,13 +117,13 @@ export function LoginForm({
 
 					<Button
 						type='submit'
-						disabled={isLoading}
+						disabled={form.formState.isSubmitting}
 						className='w-full h-12 bg-brand-700 hover:bg-brand-800 text-white rounded-full'
 					>
-						{isLoading ? (
+						{form.formState.isSubmitting ? (
 							<>
 								<Loader2 className='mr-2 h-4 w-4 animate-spin' />
-								Creating account...
+								Logging in...
 							</>
 						) : (
 							'Login'

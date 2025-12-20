@@ -1,20 +1,14 @@
-export interface AuthToken {
-	access: string;
-	type: 'Bearer';
-}
-
-export interface AuthResponse {
+interface AuthResponse {
 	message: string;
 	user: User;
-	token: AuthToken;
 }
 
-export interface LoginCredentials {
+interface LoginCredentials {
 	email: string;
 	password: string;
 }
 
-export interface RegisterCredentials {
+interface RegistrationData {
 	name: string;
 	email: string;
 	password: string;
@@ -22,16 +16,16 @@ export interface RegisterCredentials {
 	terms: boolean;
 }
 
-export interface VerifyEmailRequest {
+interface VerifyEmailRequest {
 	email: string;
 	code: string;
 }
 
-export interface ForgotPasswordRequest {
+interface ForgotPasswordRequest {
 	email: string;
 }
 
-export interface ResetPasswordRequest {
+interface ResetPasswordRequest {
 	email: string;
 	token: string;
 	password: string;

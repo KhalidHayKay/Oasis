@@ -95,7 +95,7 @@ export function VerifyEmailForm({
 	};
 
 	return (
-		<div className='space-y-6 sm:px-20'>
+		<div className='space-y-6 sm:px-10'>
 			<div className='space-y-2'>
 				<div className='size-[150px] mx-auto mb-4'>
 					<img
@@ -187,19 +187,6 @@ export function VerifyEmailForm({
 					)}
 				</Button>
 			</div>
-
-			{onBack && (
-				<div className='text-center'>
-					<Button
-						type='button'
-						variant='ghost'
-						onClick={onBack}
-						className='text-gray-600 hover:text-gray-800'
-					>
-						← Back to login
-					</Button>
-				</div>
-			)}
 		</div>
 	);
 }

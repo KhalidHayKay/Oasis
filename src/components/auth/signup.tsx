@@ -14,19 +14,15 @@ import {
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Checkbox } from '@/components/ui/checkbox';
-// import { authService } from '@/services/authService';
-// import { useAuth } from '@/contexts/AuthContext';
 import { Loader2 } from 'lucide-react';
 import Social from './social';
-// import { useToast } from '@/hooks/use-toast';
+import { useAuthStore } from '@/store/useAuthStore';
+import { toast } from 'sonner';
 
 const signupSchema = z
 	.object({
 		name: z.string().min(1, 'Name is required').max(255, 'Name is too long'),
-		email: z
-			.string()
-			.email('Invalid email address')
-			.max(255, 'Email is too long'),
+		email: z.email('Invalid email address').max(255, 'Email is too long'),
 		password: z.string().min(8, 'Password must be at least 8 characters'),
 		password_confirmation: z.string(),
 		terms: z.boolean().refine((val) => val === true, {
@@ -41,9 +37,9 @@ const signupSchema = z
 type SignupFormValues = z.infer<typeof signupSchema>;
 
 interface SignupFormProps {
-	onSuccess?: () => void;
+	onSuccess: () => void;
 	onSwitchToLogin?: () => void;
-	onNeedVerification?: (email: string) => void;
+	onNeedVerification: (email: string) => void;
 }
 
 export function SignupForm({
@@ -51,9 +47,7 @@ export function SignupForm({
 	onSwitchToLogin,
 	onNeedVerification,
 }: SignupFormProps) {
-	const [isLoading, setIsLoading] = useState(false);
-	// const { setUser } = useAuth();
-	// const { toast } = useToast();
+	const signup = useAuthStore((state) => state.register);
 
 	const form = useForm<SignupFormValues>({
 		resolver: zodResolver(signupSchema),
@@ -67,25 +61,14 @@ export function SignupForm({
 	});
 
 	const onSubmit = async (data: SignupFormValues) => {
-		// setIsLoading(true);
-		// try {
-		// 	const response = await authService.register(data);
-		// 	setUser(response.user);
-		// 	toast({
-		// 		title: 'Success',
-		// 		description: response.message,
-		// 	});
-		// 	// Navigate to email verification
-		// 	onNeedVerification?.(data.email);
-		// } catch (error: any) {
-		// 	toast({
-		// 		title: 'Error',
-		// 		description: error.message || 'Registration failed. Please try again.',
-		// 		variant: 'destructive',
-		// 	});
-		// } finally {
-		// 	setIsLoading(false);
-		// }
+		try {
+			await signup(data);
+			onNeedVerification(data.email);
+			toast.success('Reg successful');
+		} catch (error: any) {
+			onNeedVerification(data.email);
+			toast.error(error.message || 'Registration failed. Please try again.');
+		}
 	};
 
 	return (
@@ -178,10 +161,10 @@ export function SignupForm({
 
 					<Button
 						type='submit'
-						disabled={isLoading}
+						disabled={form.formState.isSubmitting}
 						className='w-full h-12 bg-brand-700 hover:bg-brand-800 text-white rounded-full'
 					>
-						{isLoading ? (
+						{form.formState.isSubmitting ? (
 							<>
 								<Loader2 className='mr-2 h-4 w-4 animate-spin' />
 								Creating account...

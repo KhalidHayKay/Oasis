@@ -3,7 +3,7 @@ import axios, {
 	AxiosResponse,
 	InternalAxiosRequestConfig,
 } from 'axios';
-import { getToken, triggerLogout } from './auth';
+import { triggerLogout } from './auth';
 
 export interface ApiResponse<T> {
 	data: T;
@@ -18,6 +18,7 @@ export const api: AxiosInstance = axios.create({
 		'Content-Type': 'application/json',
 		Accept: 'application/json',
 	},
+	withCredentials: true,
 });
 
 /**
@@ -25,15 +26,6 @@ export const api: AxiosInstance = axios.create({
  */
 api.interceptors.request.use(
 	(config: InternalAxiosRequestConfig) => {
-		// SSR check
-		if (typeof window !== 'undefined') {
-			const token = getToken();
-			if (token) {
-				config.headers = config.headers || {};
-				config.headers.Authorization = `Bearer ${token}`;
-			}
-		}
-
 		return config;
 	},
 	(error) => Promise.reject(error)
@@ -45,10 +37,7 @@ api.interceptors.request.use(
 api.interceptors.response.use(
 	(response: AxiosResponse) => response,
 	(error) => {
-		// Auto logout on 401
-		if (error.response?.status === 401) {
-			triggerLogout();
-		}
+		//
 
 		return Promise.reject(error);
 	}

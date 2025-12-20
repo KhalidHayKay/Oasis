@@ -5,6 +5,8 @@ import { Header } from '@/components/layouts/header';
 import { Footer } from '@/components/layouts/footer';
 import './globals.css';
 import routes from '@/config/routes';
+import AuthInitializer from '@/components/providers/AuthInitializer';
+import { Toaster } from '@/components/ui/sonner';
 
 const _geist = Geist({ subsets: ['latin'] });
 const _geistMono = Geist_Mono({ subsets: ['latin'] });
@@ -47,13 +49,17 @@ export default function RootLayout({
 	return (
 		<html lang='en' className={`${_geist.className} ${_geistMono.className}`}>
 			<body className={`font-sans antialiased`}>
-				<Header navLinks={navLinks} />
+				<AuthInitializer>
+					<Header navLinks={navLinks} />
 
-				<main className='bg-white pt-30 md:pt-20 px-2 sm:px-6 lg:px-12'>
-					{children}
-				</main>
+					<main className='bg-white pt-30 md:pt-20 px-2 sm:px-6 lg:px-12'>
+						{children}
+					</main>
 
-				<Footer navLinks={navLinks} />
+					<Footer navLinks={navLinks} />
+				</AuthInitializer>
+
+				<Toaster richColors />
 			</body>
 		</html>
 	);

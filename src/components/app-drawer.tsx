@@ -41,7 +41,10 @@ export function AppDrawer({
 			<DrawerTrigger asChild onClick={onTriggerClick}>
 				{trigger}
 			</DrawerTrigger>
-			<DrawerContent className='min-w-full md:min-w-3/4 lg:min-w-1/2'>
+			<DrawerContent
+				aria-describedby={undefined}
+				className='min-w-full md:min-w-3/4 lg:min-w-1/2'
+			>
 				<DrawerClose onClick={onClose} className='w-fit absolute top-7 left-5'>
 					<div className='size-8 flex items-center justify-center rounded-full bg-grey-200/20 hover:bg-grey-200/50'>
 						<X className='text-foreground size-4' />

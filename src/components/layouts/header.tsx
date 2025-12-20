@@ -7,6 +7,8 @@ import { useEffect, useState } from 'react';
 import { cn } from '@/lib/utils';
 import { usePathname } from 'next/navigation';
 import AppUser from './app-user';
+import { useAuthStore } from '@/store/useAuthStore';
+import { Skeleton } from '../ui/skeleton';
 
 export function Header({
 	navLinks,
@@ -17,12 +19,9 @@ export function Header({
 
 	const [scrollDepth, setScrollDepth] = useState(0);
 
-	const isLoggedIn = false;
-	const user = {
-		name: 'John Doe',
-		email: 'john@example.com',
-		avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=user',
-	};
+	const isLoading = useAuthStore((store) => store.isLoading);
+	const user = useAuthStore((store) => store.user);
+	const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
 
 	const activeNav =
 		navLinks.find((link) => pathname === link.href)?.label ||
@@ -43,6 +42,7 @@ export function Header({
 
 	return (
 		<header
+			inert={false}
 			className={cn(
 				'fixed top-0 z-50 w-full bg-white transition-all duration-200',
 				scrollDepth >= 80 ? 'border-b border-grey-100 shadow-sm' : ''
@@ -79,7 +79,7 @@ export function Header({
 
 					{/* Right side actions */}
 					<div className='flex items-center gap-3 lg:gap-4'>
-						{isLoggedIn && (
+						{isAuthenticated && (
 							<button className='relative p-2 hover:bg-grey-50 rounded-lg transition-colors'>
 								<Bell className='w-5 h-5 text-grey-700' />
 								<span className='absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full border-2 border-white'></span>
@@ -97,7 +97,11 @@ export function Header({
 							<ShoppingBag className='w-4 h-4' />
 						</Button>
 
-						<AppUser isLoggedIn={isLoggedIn} user={user} />
+						{isLoading ? (
+							<Skeleton className='w-8 h-8 rounded-full bg-brand-100' />
+						) : (
+							<AppUser isAuthenticated={isAuthenticated} user={user} />
+						)}
 					</div>
 				</div>
 

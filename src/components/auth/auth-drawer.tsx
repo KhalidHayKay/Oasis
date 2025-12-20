@@ -33,7 +33,6 @@ export function AuthDrawer({
 
 	const handleClose = () => {
 		setIsOpen(false);
-		// Reset to default view after closing
 		setTimeout(() => setCurrentView(defaultView), 300);
 	};
 
@@ -83,13 +82,7 @@ export function AuthDrawer({
 				);
 
 			case 'verify-email':
-				return (
-					<VerifyEmailForm
-						email={email}
-						onSuccess={handleSuccess}
-						onBack={() => setCurrentView('login')}
-					/>
-				);
+				return <VerifyEmailForm email={email} onSuccess={handleSuccess} />;
 
 			case 'forgot-password':
 				return (

@@ -13,12 +13,16 @@ export const handleApiError = (error: unknown): never => {
 
 		// Unauthorized (401)
 		if (status === 401) {
-			throw new Error('Your session has expired. Please log in again.');
+			throw new Error(
+				serverMessage ?? 'Your session has expired. Please log in again.'
+			);
 		}
 
 		// Forbidden (403)
 		if (status === 403) {
-			throw new Error('You don’t have permission to perform this action.');
+			throw new Error(
+				serverMessage ?? 'You don’t have permission to perform this action.'
+			);
 		}
 
 		// Not Found (404)
