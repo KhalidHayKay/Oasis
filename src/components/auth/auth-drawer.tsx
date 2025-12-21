@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { AppDrawer } from '@/components/app-drawer';
 import { LoginForm } from '@/components/auth/login';
 import { SignupForm } from '@/components/auth/signup';
@@ -34,19 +34,9 @@ export function AuthDrawer({
 	const [email, setEmail] = useState(userEmail);
 	const [resetToken, setResetToken] = useState('');
 
-	// Update view when defaultView changes (e.g., when opening to verify-email)
-	useEffect(() => {
-		if (open) {
-			setCurrentView(defaultView);
-			// Set email if provided (for verify-email from dropdown)
-			if (userEmail) {
-				setEmail(userEmail);
-			}
-		}
-	}, [open, defaultView, userEmail]);
-
 	const handleClose = () => {
 		onOpenChange(false);
+		setCurrentView(defaultView);
 	};
 
 	const handleSuccess = () => {
@@ -84,12 +74,11 @@ export function AuthDrawer({
 			case 'signup':
 				return (
 					<SignupForm
-						onSuccess={handleSuccess}
-						onSwitchToLogin={() => setCurrentView('login')}
-						onNeedVerification={(userEmail: string) => {
+						onSuccess={(userEmail: string) => {
 							setEmail(userEmail);
 							setCurrentView('verify-email');
 						}}
+						onSwitchToLogin={() => setCurrentView('login')}
 					/>
 				);
 

@@ -6,7 +6,8 @@ const Social = () => {
 	const [isSocialLoading, setIsSocialLoading] = useState<string | null>(null);
 
 	const handleSocialLogin = async (provider: 'google' | 'apple') => {
-		// setIsSocialLoading(provider);
+		console.log(provider);
+		setIsSocialLoading(provider);
 		// try {
 		// 	const response = await authService.openSocialAuth(provider);
 		// 	setUser(response.user);

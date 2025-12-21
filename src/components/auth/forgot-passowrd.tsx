@@ -1,6 +1,5 @@
 'use client';
 
-import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
@@ -13,10 +12,8 @@ import {
 	FormMessage,
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-// import { authService } from '@/services/authService';
-import { Loader2, CheckCircle } from 'lucide-react';
-// import { useToast } from '@/hooks/use-toast';
-
+import { Loader2 } from 'lucide-react';
+import Image from 'next/image';
 const forgotPasswordSchema = z.object({
 	email: z.email('Invalid email address').max(255, 'Email is too long'),
 });
@@ -24,7 +21,7 @@ const forgotPasswordSchema = z.object({
 type ForgotPasswordFormValues = z.infer<typeof forgotPasswordSchema>;
 
 interface ForgotPasswordFormProps {
-	onSuccess?: (userEmail: string, token: string) => void;
+	onSuccess: (userEmail: string, token: string) => void;
 	onBack?: () => void;
 }
 
@@ -32,9 +29,6 @@ export function ForgotPasswordForm({
 	onSuccess,
 	onBack,
 }: ForgotPasswordFormProps) {
-	const [isLoading, setIsLoading] = useState(false);
-	// const { toast } = useToast();
-
 	const form = useForm<ForgotPasswordFormValues>({
 		resolver: zodResolver(forgotPasswordSchema),
 		defaultValues: {
@@ -43,6 +37,8 @@ export function ForgotPasswordForm({
 	});
 
 	const onSubmit = async (data: ForgotPasswordFormValues) => {
+		console.log(data);
+		onSuccess(data.email, '');
 		// setIsLoading(true);
 		// try {
 		// 	const response = await authService.forgotPassword({
@@ -67,17 +63,19 @@ export function ForgotPasswordForm({
 	};
 
 	return (
-		<div className='space-y-6 px-20'>
+		<div className='space-y-6 sm:px-10'>
 			<div className='space-y-2'>
 				<div className='size-[150px] mx-auto mb-4'>
-					<img
+					<Image
+						width={400}
+						height={250}
 						src='/images/squircle.png'
 						alt='Welcome'
 						className='w-full h-full object-contain'
 					/>
 				</div>
 				<h2 className='text-lg font-medium text-foreground'>
-					Enter your email and we'll send a password reset OTP
+					Enter your email and we&apos;ll send a password reset OTP
 				</h2>
 			</div>
 
@@ -103,10 +101,10 @@ export function ForgotPasswordForm({
 
 					<Button
 						type='submit'
-						disabled={isLoading}
+						disabled={form.formState.isSubmitting}
 						className='w-full h-12 bg-brand-700 hover:bg-brand-800 text-white rounded-full'
 					>
-						{isLoading ? (
+						{form.formState.isSubmitting ? (
 							<>
 								<Loader2 className='mr-2 h-4 w-4 animate-spin' />
 								Resetting...

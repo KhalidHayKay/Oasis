@@ -1,15 +1,5 @@
 import { useState } from 'react';
-import { Button } from '@/components/ui/button';
-import { Factory, Gift, Star, X } from 'lucide-react';
-import {
-	Drawer,
-	DrawerClose,
-	DrawerContent,
-	DrawerFooter,
-	DrawerHeader,
-	DrawerTitle,
-	DrawerTrigger,
-} from '@/components/ui/drawer';
+import { Factory, Gift, Star } from 'lucide-react';
 import { useCart } from '@/hooks/useCart';
 import CartProduct from '@/components/cart-product';
 import { AppDrawer } from '@/components/app-drawer';

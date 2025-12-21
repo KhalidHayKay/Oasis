@@ -1,6 +1,5 @@
 'use client';
 
-import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
@@ -18,6 +17,7 @@ import { Loader2 } from 'lucide-react';
 import Social from './social';
 import { useAuthStore } from '@/store/useAuthStore';
 import { toast } from 'sonner';
+import Image from 'next/image';
 
 const signupSchema = z
 	.object({
@@ -37,16 +37,11 @@ const signupSchema = z
 type SignupFormValues = z.infer<typeof signupSchema>;
 
 interface SignupFormProps {
-	onSuccess: () => void;
+	onSuccess: (email: string) => void;
 	onSwitchToLogin?: () => void;
-	onNeedVerification: (email: string) => void;
 }
 
-export function SignupForm({
-	onSuccess,
-	onSwitchToLogin,
-	onNeedVerification,
-}: SignupFormProps) {
+export function SignupForm({ onSuccess, onSwitchToLogin }: SignupFormProps) {
 	const signup = useAuthStore((state) => state.register);
 
 	const form = useForm<SignupFormValues>({
@@ -63,11 +58,14 @@ export function SignupForm({
 	const onSubmit = async (data: SignupFormValues) => {
 		try {
 			const res = await signup(data);
-			onNeedVerification(data.email);
+			onSuccess(data.email);
 			toast.success(res.message || 'Reg successful');
-		} catch (error: any) {
-			onNeedVerification(data.email);
-			toast.error(error.message || 'Registration failed. Please try again.');
+		} catch (error) {
+			const message =
+				error instanceof Error
+					? error.message
+					: 'Registration failed. Please try again.';
+			toast.error(message);
 		}
 	};
 
@@ -75,14 +73,16 @@ export function SignupForm({
 		<div className='space-y-6 sm:px-10'>
 			<div className='space-y-2'>
 				<div className='size-[150px] mx-auto mb-4'>
-					<img
+					<Image
+						width={400}
+						height={250}
 						src='/images/cat/bed.png'
 						alt='Welcome'
 						className='w-full h-full object-contain'
 					/>
 				</div>
 				<h2 className='text-lg font-medium text-foreground'>
-					Let's get your account set up
+					Let&apos;s get your account set up
 				</h2>
 			</div>
 

@@ -1,7 +1,5 @@
-// components/auth/ResetPasswordForm.tsx
 'use client';
 
-import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
@@ -14,9 +12,7 @@ import {
 	FormMessage,
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-// import { authService } from '@/services/authService';
 import { Loader2, CheckCircle } from 'lucide-react';
-// import { useToast } from '@/hooks/use-toast';
 
 const resetPasswordSchema = z
 	.object({
@@ -41,9 +37,6 @@ export function ResetPasswordForm({
 	token,
 	onSuccess,
 }: ResetPasswordFormProps) {
-	const [isLoading, setIsLoading] = useState(false);
-	// const { toast } = useToast();
-
 	const form = useForm<ResetPasswordFormValues>({
 		resolver: zodResolver(resetPasswordSchema),
 		defaultValues: {
@@ -53,6 +46,8 @@ export function ResetPasswordForm({
 	});
 
 	const onSubmit = async (data: ResetPasswordFormValues) => {
+		console.log(email, token, data);
+		onSuccess?.();
 		// setIsLoading(true);
 		// try {
 		// 	const response = await authService.resetPassword({
@@ -128,10 +123,10 @@ export function ResetPasswordForm({
 
 					<Button
 						type='submit'
-						disabled={isLoading}
+						disabled={form.formState.isSubmitting}
 						className='w-full h-12 bg-brand-700 hover:bg-brand-800 text-white rounded-full'
 					>
-						{isLoading ? (
+						{form.formState.isSubmitting ? (
 							<>
 								<Loader2 className='mr-2 h-4 w-4 animate-spin' />
 								Resetting...

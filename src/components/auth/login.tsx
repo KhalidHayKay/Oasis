@@ -16,6 +16,7 @@ import { Loader2 } from 'lucide-react';
 import Social from './social';
 import { useAuthStore } from '@/store/useAuthStore';
 import { toast } from 'sonner';
+import Image from 'next/image';
 
 const loginSchema = z.object({
 	email: z.email('Invalid email address').max(255, 'Email is too long'),
@@ -50,8 +51,10 @@ export function LoginForm({
 			const res = await login(credentials);
 			toast.success(res.message || 'Login successful');
 			onSuccess();
-		} catch (error: any) {
-			toast.error(error.message || 'Registration failed. Please try again.');
+		} catch (error) {
+			const message =
+				error instanceof Error ? error.message : 'Login failed. Please try again.';
+			toast.error(message);
 		}
 	};
 
@@ -59,7 +62,9 @@ export function LoginForm({
 		<div className='space-y-6 sm:px-10'>
 			<div className='space-y-2'>
 				<div className='size-[150px] mx-auto mb-4'>
-					<img
+					<Image
+						width={400}
+						height={250}
 						src='/images/cat/accessories.png'
 						alt='Welcome'
 						className='w-full h-full object-contain'

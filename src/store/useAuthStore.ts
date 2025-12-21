@@ -17,7 +17,7 @@ interface AuthState {
 	initializeAuth: () => Promise<void>;
 }
 
-export const useAuthStore = create<AuthState>((set, get) => ({
+export const useAuthStore = create<AuthState>((set) => ({
 	// Initial state
 	user: null,
 	isAuthenticated: false,
@@ -35,7 +35,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 			}
 
 			set({ isInitiatingAuth: false });
-		} catch (error) {
+		} catch {
 			set({ isAuthenticated: false, isInitiatingAuth: false });
 		}
 	},
@@ -48,7 +48,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 				isAuthenticated: true,
 			});
 			return response;
-		} catch (error: unknown) {
+		} catch (error) {
 			throw error;
 		}
 	},
@@ -61,7 +61,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 				isAuthenticated: true,
 			});
 			return response;
-		} catch (error: any) {
+		} catch (error) {
 			throw error;
 		}
 	},
@@ -74,7 +74,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 				isAuthenticated: true,
 			});
 			return response;
-		} catch (error: any) {
+		} catch (error) {
 			throw error;
 		}
 	},
@@ -90,7 +90,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 	//         isLoading: false,
 	//         error: null,
 	//       });
-	//     } catch (error: any) {
+	//     } catch (error) {
 	//       set({
 	//         isLoading: false,
 	//         error: error.message || 'Social login failed',

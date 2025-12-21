@@ -32,7 +32,7 @@ export default function AppUser({
 
 	// Single drawer state managed at this level
 	const [isDrawerOpen, setIsDrawerOpen] = useState(false);
-	const [authView, setAuthView] = useState<AuthView>('verify-email');
+	const [authView, setAuthView] = useState<AuthView>('login');
 
 	const openDrawer = (view: AuthView) => {
 		setAuthView(view);
@@ -49,8 +49,9 @@ export default function AppUser({
 			const message = await logout();
 
 			toast(message || 'Logout successful');
-		} catch (error: any) {
-			toast.error(error.message);
+		} catch (error) {
+			const message = error instanceof Error ? error.message : 'Failed to logout.';
+			toast.error(message);
 		}
 	};
 
@@ -90,7 +91,10 @@ export default function AppUser({
 								<div className='px-2 py-1.5'>
 									<Button
 										size='sm'
-										onClick={() => openDrawer('verify-email')}
+										onClick={(e) => {
+											openDrawer('verify-email');
+											e.currentTarget.blur();
+										}}
 										className='w-full bg-orange-600 hover:bg-orange-700 text-white'
 									>
 										Verify Email
@@ -130,8 +134,11 @@ export default function AppUser({
 			) : (
 				<Button
 					size='sm'
-					onClick={() => openDrawer('login')}
-					className='bg-brand-800 text-white hover:bg-brand-700 rounded-full'
+					onClick={(e) => {
+						openDrawer('login');
+						e.currentTarget.blur();
+					}}
+					className='bg-brand-800 text-white hover:bg-brand-700 rounded-full focus-visible::bg-red-500'
 				>
 					Get Started
 				</Button>

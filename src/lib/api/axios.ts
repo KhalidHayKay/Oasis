@@ -3,7 +3,6 @@ import axios, {
 	AxiosResponse,
 	InternalAxiosRequestConfig,
 } from 'axios';
-import { triggerLogout } from './auth';
 
 export interface ApiResponse<T> {
 	data: T;

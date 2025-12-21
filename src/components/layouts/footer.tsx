@@ -1,7 +1,5 @@
 import Link from 'next/link';
 import { ArrowUp } from 'lucide-react';
-import Image from 'next/image';
-import routes from '@/config/routes';
 import { Fragment } from 'react/jsx-runtime';
 import Logo from '../logo';
 
@@ -15,7 +13,7 @@ export function Footer({
 			<div className='px-10 py-20 sm:px-10 lg:px-20'>
 				<div className='grid gap-x-20 md:grid-cols-[auto_auto_auto_auto] items-end'>
 					<div className='flex flex-col gap-y-15 md:gap-y-30'>
-						<Logo />
+						<Logo secondary />
 
 						<nav className=''>
 							<p className='flex flex-wrap max-w-40'>

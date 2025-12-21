@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { Bell, ShoppingBag, Sofa } from 'lucide-react';
+import { ShoppingBag } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useEffect, useState } from 'react';
 import { cn } from '@/lib/utils';
@@ -54,7 +54,7 @@ export function Header({
 					<Logo />
 
 					{/* Navigation - Hidden on mobile, shown on md+ */}
-					<nav className='hidden md:flex items-center gap-8 absolute left-1/2 -translate-x-1/2'>
+					<nav className='hidden md:flex items-center gap-8 absolute left-2/5 lg:left-1/2 -translate-x-1/2'>
 						{navLinks.map((link, i) => (
 							<Link
 								key={i}
