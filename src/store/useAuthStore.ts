@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { authService } from '@/services/authService';
+import { useCartStore } from './useCartStore';
 
 interface AuthState {
 	// State
@@ -26,10 +27,13 @@ export const useAuthStore = create<AuthState>((set) => ({
 
 	initializeAuth: async () => {
 		set({ isInitiatingAuth: true });
+
 		try {
 			const user = await authService.getUser();
 			if (user) {
 				set({ user, isAuthenticated: true });
+
+				await useCartStore.getState().loadCartFromBackend();
 			} else {
 				set({ isAuthenticated: false });
 			}
@@ -47,6 +51,9 @@ export const useAuthStore = create<AuthState>((set) => ({
 				user: response.user,
 				isAuthenticated: true,
 			});
+
+			await useCartStore.getState().syncGuestCartToBackend();
+
 			return response;
 		} catch (error) {
 			throw error;
@@ -60,6 +67,9 @@ export const useAuthStore = create<AuthState>((set) => ({
 				user: response.user,
 				isAuthenticated: true,
 			});
+
+			await useCartStore.getState().syncGuestCartToBackend();
+
 			return response;
 		} catch (error) {
 			throw error;
@@ -73,6 +83,9 @@ export const useAuthStore = create<AuthState>((set) => ({
 				user: response.user,
 				isAuthenticated: true,
 			});
+
+			await useCartStore.getState().syncGuestCartToBackend();
+
 			return response;
 		} catch (error) {
 			throw error;
@@ -103,6 +116,10 @@ export const useAuthStore = create<AuthState>((set) => ({
 		set({ isInitiatingAuth: true });
 		try {
 			const response = await authService.logout();
+
+			useCartStore.getState().resetSyncFlag();
+			useCartStore.setState({ items: [] });
+
 			return response.message;
 		} catch (error) {
 			throw error;

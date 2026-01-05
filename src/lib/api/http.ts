@@ -24,7 +24,17 @@ export const http = {
 
 	put: async <T, D = unknown>(url: string, data?: D): Promise<T> => {
 		try {
-			const res = await api.put(url, data);
+			const res = await api.post(url, { ...data, _method: 'PUT' });
+			return res.data;
+		} catch (err) {
+			handleApiError(err);
+			throw err;
+		}
+	},
+
+	patch: async <T, D = unknown>(url: string, data?: D): Promise<T> => {
+		try {
+			const res = await api.patch(url, data);
 			return res.data;
 		} catch (err) {
 			handleApiError(err);

@@ -1,3 +1,5 @@
+import { sync } from 'motion/react';
+
 const routes = {
 	page: {
 		home: '/',
@@ -44,6 +46,7 @@ const routes = {
 		cart: {
 			all: '/api/cart',
 			add: '/api/cart/items',
+			sync: '/api/cart/sync',
 			incrementQuantity: (productId: number) =>
 				`/api/cart/items/${productId}/quantity/increment`,
 			decrementQuantity: (productId: number) =>

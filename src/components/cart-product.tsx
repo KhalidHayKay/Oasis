@@ -1,30 +1,11 @@
+import { useCartStore } from '@/store/useCartStore';
 import Image from 'next/image';
-import { useState } from 'react';
 
-interface CartProductProps {
-	name: string;
-	description: string;
-	price: number;
-	colors: string[];
-	selectedColor: number;
-	image: {
-		src: string;
-		alt: string;
-	};
-	quantity: number;
-}
+const CartProduct = ({ item }: { item: CartItem }) => {
+	const updateQuantity = useCartStore((state) => state.updateQuantity);
 
-const CartProduct = ({
-	name,
-	description,
-	price,
-	colors,
-	selectedColor: initialSelectedColor,
-	image,
-	quantity: initialQuantity,
-}: CartProductProps) => {
-	const [quantity, setQuantity] = useState(initialQuantity);
-	const [selectedColor, setSelectedColor] = useState(initialSelectedColor);
+	const { productName, productDesc, productImage, unitPrice, color, quantity } =
+		item;
 
 	return (
 		<div className='grid grid-cols-[1fr_2fr] items-center gap-x-5'>
@@ -32,47 +13,36 @@ const CartProduct = ({
 				<Image
 					width={600}
 					height={400}
-					src={image.src}
-					alt={image.alt}
+					src={productImage.src}
+					alt={productImage.alt}
 					className='object-cover'
 				/>
 			</div>
 			<div className='flex flex-col h-full justify-around gap-y-3'>
 				<div className='flex justify-between sm:flex-col gap-1'>
 					<h1 className='text-lg md:text-xl font-medium sm:font-semibold text-foreground'>
-						{name}
+						{productName}
 					</h1>
 					<p className='hidden sm:block text-grey-600 text-sm leading-relaxed'>
-						{description}
+						{productDesc}
 					</p>
 					<span className='text-base sm:text-xl font-medium sm:font-semibold text-brand-800 mt-1'>
-						${price}.00
+						${unitPrice}
 					</span>
 				</div>
 
 				<div className='flex flex-row products-center justify-between py-3'>
 					{/* Color Selection */}
 					<div className='flex flex-col gap-3'>
-						<div className='flex gap-3'>
-							{colors.map((color, index) => (
-								<button
-									key={index}
-									onClick={() => setSelectedColor(index)}
-									className={`size-5 rounded-xl border-2 transition-all ${
-										selectedColor === index
-											? 'border-primary ring-2 ring-primary ring-offset-2'
-											: 'border-border'
-									}`}
-									style={{ backgroundColor: color }}
-									aria-label={`Color option ${index + 1}`}
-								/>
-							))}
-						</div>
+						<button
+							className='size-5 rounded-xl border-2 transition-all border-border'
+							style={{ backgroundColor: color }}
+						/>
 					</div>
 					{/* Quantity Selector */}
 					<div className='flex border border-border rounded-lg'>
 						<button
-							onClick={() => setQuantity(Math.max(1, quantity - 1))}
+							onClick={() => updateQuantity(item, quantity - 1)}
 							className='px-2 py-1 hover:bg-muted transition-colors'
 							aria-label='Decrease quantity'
 						>
@@ -82,7 +52,7 @@ const CartProduct = ({
 							{quantity}
 						</span>
 						<button
-							onClick={() => setQuantity(quantity + 1)}
+							onClick={() => updateQuantity(item, quantity + 1)}
 							className='px-2 py-1 hover:bg-muted transition-colors'
 							aria-label='Increase quantity'
 						>

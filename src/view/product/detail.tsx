@@ -1,8 +1,10 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { Factory, Gift, Star } from 'lucide-react';
 import { useCart } from '@/hooks/useCart';
 import CartProduct from '@/components/cart-product';
 import { AppDrawer } from '@/components/app-drawer';
+import { useCartStore } from '@/store/useCartStore';
+import { processDiscount } from '@/lib/utils';
 
 interface DetailProps {
 	product: ProductDetails;
@@ -12,13 +14,23 @@ const Detail = ({ product }: DetailProps) => {
 	const [selectedColor, setSelectedColor] = useState(0);
 	const [quantity, setQuantity] = useState(1);
 
-	const { add, items } = useCart();
+	// const { add, items } = useCart();
+	const addItem = useCartStore((state) => state.addItem);
+	const updateQuantity = useCartStore((state) => state.updateQuantity);
+	const items = useCartStore((state) => state.items);
+	const isLoading = useCartStore((state) => state.isLoading);
+	const isSyncing = useCartStore((state) => state.isSyncing);
 
-	const { name, description, price, rating, colors, featuredImage } = product;
+	const { id, name, description, price, rating, colors } = product;
 
-	const discountedPrice = Math.round(price.amount * (1 - price.discount / 100));
+	// const handleCheckout = () => console.log('object');
 
-	const handleCheckout = () => console.log('object');
+	const cartItem = items.find(
+		(item) =>
+			item.productId === product.id && item.color === colors[selectedColor]
+	);
+
+	const hasEntry = !!cartItem;
 
 	return (
 		<div className='flex-1 flex flex-col gap-6'>
@@ -51,7 +63,7 @@ const Detail = ({ product }: DetailProps) => {
 			{/* Price Section */}
 			<div className='flex items-center gap-3'>
 				<span className='text-4xl font-semibold text-brand-800'>
-					${discountedPrice}
+					${processDiscount(price)}
 				</span>
 				<span className='text-sm text-muted-foreground line-through'>
 					${price.amount}
@@ -84,58 +96,38 @@ const Detail = ({ product }: DetailProps) => {
 						))}
 					</div>
 				</div>
-				{/* Quantity Selector */}
-				<div className='flex items-center gap-4'>
-					<span className='text-sm font-semibold text-foreground'>Quantity</span>
-					<div className='flex items-center border border-border rounded-lg'>
-						<button
-							onClick={() => setQuantity(Math.max(1, quantity - 1))}
-							className='px-3 py-2 hover:bg-muted transition-colors'
-							aria-label='Decrease quantity'
-						>
-							−
-						</button>
-						<span className='px-4 py-2 min-w-12 text-center font-medium'>
-							{quantity}
-						</span>
-						<button
-							onClick={() => setQuantity(quantity + 1)}
-							className='px-3 py-2 hover:bg-muted transition-colors'
-							aria-label='Increase quantity'
-						>
-							+
-						</button>
-					</div>
-				</div>
 			</div>
 
 			{/* CTA Button */}
-			<AppDrawer
-				trigger={
-					<button className='w-full bg-brand-700 hover:bg-brand-800 text-white font-semibold py-3 text-lg rounded-full'>
-						Add to Cart
+			{!hasEntry ? (
+				<button
+					disabled={isLoading || isSyncing}
+					onClick={() => addItem(product, quantity, colors[selectedColor])}
+					className='w-full bg-brand-700 disabled:bg-brand-700/50 hover:bg-brand-800 disabled:hover:bg-brand-800/50 text-white font-semibold py-3 text-lg rounded-full'
+				>
+					Add to Cart
+				</button>
+			) : (
+				<div className='flex items-center justify-between w-full border border-brand-700 rounded-full px-4 py-2'>
+					<button
+						disabled={isLoading || isSyncing}
+						onClick={() => updateQuantity(cartItem, cartItem.quantity - 1)}
+						className='text-2xl font-bold px-3'
+					>
+						−
 					</button>
-				}
-				title='cart'
-				onTriggerClick={() => add(product)}
-				footerButton={{
-					label: 'Next',
-					onClick: handleCheckout,
-				}}
-			>
-				{items.map((item, index) => (
-					<CartProduct
-						key={`${item.id}-${index}`}
-						name={name}
-						description={description}
-						price={discountedPrice}
-						colors={colors}
-						selectedColor={selectedColor}
-						image={featuredImage}
-						quantity={quantity}
-					/>
-				))}
-			</AppDrawer>
+
+					<span className='text-lg font-semibold'>{cartItem.quantity}</span>
+
+					<button
+						disabled={isLoading || isSyncing}
+						onClick={() => updateQuantity(cartItem, cartItem.quantity + 1)}
+						className='text-2xl font-bold px-3'
+					>
+						+
+					</button>
+				</div>
+			)}
 
 			{/* Additional Info */}
 			<div className='flex flex-col gap-3 text-foreground text-sm sm:text-base'>

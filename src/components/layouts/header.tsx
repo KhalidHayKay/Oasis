@@ -10,6 +10,8 @@ import AppUser from './app-user';
 import { useAuthStore } from '@/store/useAuthStore';
 import { Skeleton } from '../ui/skeleton';
 import Logo from '../logo';
+import { CheckoutDrawer } from '../checkout/checkout-drawer';
+import { useCartStore } from '@/store/useCartStore';
 
 export function Header({
 	navLinks,
@@ -19,10 +21,12 @@ export function Header({
 	const pathname = usePathname();
 
 	const [scrollDepth, setScrollDepth] = useState(0);
+	const [isCartOpen, setIsCartOpen] = useState(false);
 
-	const isInitiatingAuth = useAuthStore((store) => store.isInitiatingAuth);
-	const user = useAuthStore((store) => store.user);
-	const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
+	const isInitiatingAuth = useAuthStore((state) => state.isInitiatingAuth);
+	const user = useAuthStore((state) => state.user);
+	const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
+	const totalCartItems = useCartStore((state) => state.getTotalItems());
 
 	const activeNav =
 		navLinks.find((link) => pathname === link.href)?.label ||
@@ -77,14 +81,20 @@ export function Header({
 					{/* Right side actions */}
 					<div className='flex items-center gap-3 lg:gap-4'>
 						<Button
+							onClick={() => setIsCartOpen(true)}
 							variant='outline'
 							size='sm'
-							className='gap-2 rounded-full border-grey-300 text-grey-700 hover:bg-grey-50 hover:text-grey-900 hover:border-grey-400'
+							className='gap-2 rounded-full border-grey-300 text-grey-700 hover:bg-grey-50 hover:text-grey-900 hover:border-grey-400 relative'
 						>
 							<span className='hidden sm:inline text-xs font-medium tracking-wide'>
 								MY CART
 							</span>
 							<ShoppingBag className='w-4 h-4' />
+							{totalCartItems > 0 && (
+								<span className='absolute -top-1 -right-1 inline-flex items-center justify-center min-w-3 sm:min-w-4 h-3 sm:h-4 px-1 text-[9px] sm:text-[10px] font-bold text-white bg-brandRed rounded-full'>
+									{totalCartItems > 99 ? '99+' : totalCartItems}
+								</span>
+							)}
 						</Button>
 
 						{isInitiatingAuth ? (
@@ -116,6 +126,15 @@ export function Header({
 					))}
 				</nav>
 			</div>
+
+			<CheckoutDrawer
+				open={isCartOpen}
+				onOpenChange={setIsCartOpen}
+				defaultView='cart'
+				onSuccess={() => console.log('object')}
+				isAuthenticated={isAuthenticated}
+				userEmail={user?.email}
+			/>
 		</header>
 	);
 }
