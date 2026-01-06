@@ -28,10 +28,7 @@ export function Header({
 	const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
 	const totalCartItems = useCartStore((state) => state.getTotalItems());
 
-	const activeNav =
-		navLinks.find((link) => pathname === link.href)?.label ||
-		navLinks[0]?.label ||
-		'home';
+	const activeNav = navLinks.find((link) => pathname === link.href)?.label || '';
 
 	const handleWindowScroll = () => {
 		setScrollDepth(window.scrollY);
