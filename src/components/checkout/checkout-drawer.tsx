@@ -2,6 +2,7 @@ import { useCartStore } from '@/store/useCartStore';
 import { useState } from 'react';
 import CartView from './cart-view';
 import { AppDrawer } from '../app-drawer';
+import CheckoutView, { CheckoutFormValues } from './checkout-view';
 
 type CheckoutView = 'cart' | 'checkout' | 'payment' | 'success';
 
@@ -23,7 +24,7 @@ export function CheckoutDrawer({
 	userEmail = '',
 }: CheckoutDrawerProps) {
 	const [currentView, setCurrentView] = useState<CheckoutView>(defaultView);
-	const [shippingData, setShippingData] = useState(null);
+	// const [shippingData, setShippingData] = useState(null);
 
 	const items = useCartStore((state) => state.items);
 
@@ -38,10 +39,11 @@ export function CheckoutDrawer({
 		setTimeout(() => setCurrentView(defaultView), 300);
 	};
 
-	//   const handleCheckoutSuccess = (data) => {
-	//     setShippingData(data);
-	//     setCurrentView('payment');
-	//   };
+	const handleCheckoutSuccess = (data: CheckoutFormValues) => {
+		console.log(data);
+		// setShippingData(data);
+		// setCurrentView('payment');
+	};
 
 	//   const handlePaymentSuccess = (data) => {
 	//     console.log('Order completed:', { ...shippingData, ...data });
@@ -77,12 +79,12 @@ export function CheckoutDrawer({
 		}
 	};
 
-	const canGoBack = currentView === 'checkout' || currentView === 'payment';
+	// const canGoBack = currentView === 'checkout' || currentView === 'payment';
 
-	const handleBack = () => {
-		if (currentView === 'payment') setCurrentView('checkout');
-		else if (currentView === 'checkout') setCurrentView('cart');
-	};
+	// const handleBack = () => {
+	// 	if (currentView === 'payment') setCurrentView('checkout');
+	// 	else if (currentView === 'checkout') setCurrentView('cart');
+	// };
 
 	const renderContent = () => {
 		switch (currentView) {
@@ -96,13 +98,13 @@ export function CheckoutDrawer({
 				);
 
 			case 'checkout':
-				return '';
-			//   <CheckoutView
-			//     onSuccess={handleCheckoutSuccess}
-			//     isAuthenticated={isAuthenticated}
-			//     userEmail={userEmail}
-			//   />
-
+				return (
+					<CheckoutView
+						onSuccess={handleCheckoutSuccess}
+						isAuthenticated={isAuthenticated}
+						userEmail={userEmail}
+					/>
+				);
 			case 'payment':
 				return ''; // <PaymentView onSuccess={handlePaymentSuccess} />;
 

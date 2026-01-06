@@ -9,7 +9,7 @@ interface CartState {
 	items: CartItem[];
 	isLoading: boolean;
 	isSyncing: boolean;
-	hasSyncedOnLogin: boolean; // Prevent double sync
+	hasSyncedOnLogin: boolean;
 
 	// Actions
 	addItem: (
@@ -231,7 +231,9 @@ export const useCartStore = create<CartState>()(
 					set({ hasSyncedOnLogin: true, isSyncing: false });
 				} catch (error) {
 					console.error('Failed to sync cart:', error);
-					set({ isSyncing: false });
+					set({
+						isSyncing: false,
+					});
 					throw error;
 				}
 			},

@@ -7,6 +7,14 @@ const CartProduct = ({ item }: { item: CartItem }) => {
 	const { productName, productDesc, productImage, unitPrice, color, quantity } =
 		item;
 
+	const handleIncrement = async () => {
+		await updateQuantity(item, item.quantity + 1);
+	};
+
+	const handleDecrement = async () => {
+		await updateQuantity(item, item.quantity - 1);
+	};
+
 	return (
 		<div className='grid grid-cols-[1fr_2fr] items-center gap-x-5'>
 			<div className='relative bg-muted rounded-lg overflow-hidden aspect-square flex items-center justify-center h-full w-full'>
@@ -42,7 +50,7 @@ const CartProduct = ({ item }: { item: CartItem }) => {
 					{/* Quantity Selector */}
 					<div className='flex border border-border rounded-lg'>
 						<button
-							onClick={() => updateQuantity(item, quantity - 1)}
+							onClick={handleDecrement}
 							className='px-2 py-1 hover:bg-muted transition-colors'
 							aria-label='Decrease quantity'
 						>
@@ -52,7 +60,7 @@ const CartProduct = ({ item }: { item: CartItem }) => {
 							{quantity}
 						</span>
 						<button
-							onClick={() => updateQuantity(item, quantity + 1)}
+							onClick={handleIncrement}
 							className='px-2 py-1 hover:bg-muted transition-colors'
 							aria-label='Increase quantity'
 						>

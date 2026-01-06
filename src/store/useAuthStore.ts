@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { authService } from '@/services/authService';
 import { useCartStore } from './useCartStore';
+import { toast } from 'sonner';
 
 interface AuthState {
 	// State
@@ -33,7 +34,24 @@ export const useAuthStore = create<AuthState>((set) => ({
 			if (user) {
 				set({ user, isAuthenticated: true });
 
-				await useCartStore.getState().loadCartFromBackend();
+				const { loadCartFromBackend, hasSyncedOnLogin, syncGuestCartToBackend } =
+					useCartStore.getState();
+
+				if (!hasSyncedOnLogin) {
+					syncGuestCartToBackend().catch((error) => {
+						console.error('Failed to load cart on auth init:', error);
+						toast.error('Failed to load cart. Please refresh the page.', {
+							duration: 2000,
+						});
+					});
+				} else {
+					loadCartFromBackend().catch((error) => {
+						console.error('Failed to load cart on auth init:', error);
+						toast.error(error.message, {
+							duration: 2000,
+						});
+					});
+				}
 			} else {
 				set({ isAuthenticated: false });
 			}
@@ -52,7 +70,15 @@ export const useAuthStore = create<AuthState>((set) => ({
 				isAuthenticated: true,
 			});
 
-			await useCartStore.getState().syncGuestCartToBackend();
+			useCartStore
+				.getState()
+				.syncGuestCartToBackend()
+				.catch((error) => {
+					console.error('Cart sync failed:', error);
+					toast.error('Cart sync failed. Please refresh the page.', {
+						duration: 2000,
+					});
+				});
 
 			return response;
 		} catch (error) {
@@ -68,8 +94,6 @@ export const useAuthStore = create<AuthState>((set) => ({
 				isAuthenticated: true,
 			});
 
-			await useCartStore.getState().syncGuestCartToBackend();
-
 			return response;
 		} catch (error) {
 			throw error;
@@ -84,7 +108,15 @@ export const useAuthStore = create<AuthState>((set) => ({
 				isAuthenticated: true,
 			});
 
-			await useCartStore.getState().syncGuestCartToBackend();
+			useCartStore
+				.getState()
+				.syncGuestCartToBackend()
+				.catch((error) => {
+					console.error('Cart sync failed:', error);
+					toast.error('Cart sync failed. Please refresh the page.', {
+						duration: 2000,
+					});
+				});
 
 			return response;
 		} catch (error) {

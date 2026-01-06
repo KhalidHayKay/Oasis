@@ -1,5 +1,3 @@
-import { sync } from 'motion/react';
-
 const routes = {
 	page: {
 		home: '/',

@@ -1,8 +1,5 @@
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
 import { Factory, Gift, Star } from 'lucide-react';
-import { useCart } from '@/hooks/useCart';
-import CartProduct from '@/components/cart-product';
-import { AppDrawer } from '@/components/app-drawer';
 import { useCartStore } from '@/store/useCartStore';
 import { processDiscount } from '@/lib/utils';
 
@@ -12,18 +9,16 @@ interface DetailProps {
 
 const Detail = ({ product }: DetailProps) => {
 	const [selectedColor, setSelectedColor] = useState(0);
-	const [quantity, setQuantity] = useState(1);
 
-	// const { add, items } = useCart();
 	const addItem = useCartStore((state) => state.addItem);
 	const updateQuantity = useCartStore((state) => state.updateQuantity);
 	const items = useCartStore((state) => state.items);
 	const isLoading = useCartStore((state) => state.isLoading);
 	const isSyncing = useCartStore((state) => state.isSyncing);
 
-	const { id, name, description, price, rating, colors } = product;
+	console.log(isLoading, isSyncing);
 
-	// const handleCheckout = () => console.log('object');
+	const { name, description, price, rating, colors } = product;
 
 	const cartItem = items.find(
 		(item) =>
@@ -31,6 +26,22 @@ const Detail = ({ product }: DetailProps) => {
 	);
 
 	const hasEntry = !!cartItem;
+
+	const handleAddItem = async () => {
+		await addItem(product, 1, colors[selectedColor]);
+	};
+
+	const handleIncrement = async () => {
+		if (cartItem) {
+			await updateQuantity(cartItem, cartItem.quantity + 1);
+		}
+	};
+
+	const handleDecrement = async () => {
+		if (cartItem) {
+			await updateQuantity(cartItem, cartItem.quantity - 1);
+		}
+	};
 
 	return (
 		<div className='flex-1 flex flex-col gap-6'>
@@ -102,7 +113,7 @@ const Detail = ({ product }: DetailProps) => {
 			{!hasEntry ? (
 				<button
 					disabled={isLoading || isSyncing}
-					onClick={() => addItem(product, quantity, colors[selectedColor])}
+					onClick={handleAddItem}
 					className='w-full bg-brand-700 disabled:bg-brand-700/50 hover:bg-brand-800 disabled:hover:bg-brand-800/50 text-white font-semibold py-3 text-lg rounded-full'
 				>
 					Add to Cart
@@ -111,7 +122,7 @@ const Detail = ({ product }: DetailProps) => {
 				<div className='flex items-center justify-between w-full border border-brand-700 rounded-full px-4 py-2'>
 					<button
 						disabled={isLoading || isSyncing}
-						onClick={() => updateQuantity(cartItem, cartItem.quantity - 1)}
+						onClick={handleDecrement}
 						className='text-2xl font-bold px-3'
 					>
 						−
@@ -121,7 +132,7 @@ const Detail = ({ product }: DetailProps) => {
 
 					<button
 						disabled={isLoading || isSyncing}
-						onClick={() => updateQuantity(cartItem, cartItem.quantity + 1)}
+						onClick={handleIncrement}
 						className='text-2xl font-bold px-3'
 					>
 						+

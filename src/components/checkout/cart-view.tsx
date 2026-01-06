@@ -2,7 +2,6 @@ import Image from 'next/image';
 import CartProduct from '../cart-product';
 
 const CartView = ({ items }: { items: CartItem[] }) => {
-	console.log(items);
 	if (items.length === 0) {
 		return (
 			<div className='flex flex-col items-center justify-center py-20'>
