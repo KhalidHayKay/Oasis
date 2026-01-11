@@ -1,7 +1,6 @@
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
-import { Button } from '@/components/ui/button';
 import {
 	Form,
 	FormControl,
@@ -11,12 +10,13 @@ import {
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Loader2 } from 'lucide-react';
-import { useAuthStore } from '@/store/useAuthStore';
 import { toast } from 'sonner';
-import Image from 'next/image';
+import { FooterActionSetterType } from './checkout-drawer';
+import { useEffect, useCallback } from 'react';
+import { useCheckoutStore } from '@/store/useCheckoutStore';
 
 const checkoutSchema = z.object({
-	email: z.email('Invalid email address').max(255, 'Email is too long'),
+	email: z.string().email('Invalid email address').max(255, 'Email is too long'),
 	firstName: z
 		.string()
 		.min(1, 'First name is required')
@@ -43,17 +43,13 @@ const checkoutSchema = z.object({
 export type CheckoutFormValues = z.infer<typeof checkoutSchema>;
 
 interface CheckoutFormProps {
-	onSuccess: (data: CheckoutFormValues) => void;
-	isAuthenticated: boolean;
 	userEmail: string;
+	setFooterAction: FooterActionSetterType;
+	next: () => void;
 }
 
-function CheckoutView({
-	onSuccess,
-	isAuthenticated,
-	userEmail,
-}: CheckoutFormProps) {
-	const form = useForm({
+function CheckoutView({ userEmail, setFooterAction, next }: CheckoutFormProps) {
+	const form = useForm<CheckoutFormValues>({
 		resolver: zodResolver(checkoutSchema),
 		defaultValues: {
 			email: userEmail || '',
@@ -66,110 +62,169 @@ function CheckoutView({
 		},
 	});
 
-	const onSubmit = (data: CheckoutFormValues) => {
-		onSuccess(data);
-	};
+	const checkout = useCheckoutStore((state) => state.checkout);
+
+	const onSubmit = useCallback(async (values: CheckoutFormValues) => {
+		const data: CheckoutRequest = {
+			shipping_fname: values.firstName,
+			shipping_lname: values.lastName,
+			shipping_phone: values.phone,
+			shipping_address: values.address,
+			shipping_city: values.city,
+			shipping_state: values.city,
+			shipping_lga: values.country,
+		};
+
+		try {
+			await checkout(data);
+			next();
+		} catch (error) {
+			const message =
+				error instanceof Error
+					? error.message
+					: 'Unable to check out. Please try again';
+			toast.error(message);
+		}
+	}, []);
+
+	// Set the footer action when component mounts
+	useEffect(() => {
+		const handleFormSubmit = () => {
+			form.handleSubmit(onSubmit)();
+		};
+
+		setFooterAction(() => handleFormSubmit);
+
+		return () => setFooterAction(null);
+	}, [setFooterAction, form, onSubmit]);
 
 	return (
-		<div className='px-5 sm:px-10 xl:px-20 pb-24 h-full overflow-y-auto'>
-			<form onSubmit={form.handleSubmit(onSubmit)} className='space-y-4'>
-				<div>
-					<h3 className='text-sm font-medium text-gray-700 mb-3'>
-						Customer Information
-					</h3>
-					{!isAuthenticated && (
-						<div className='text-sm text-gray-600 mb-3'>
-							Have an account?{' '}
-							<button
-								type='button'
-								className='text-purple-600 hover:underline font-medium'
-							>
-								Login
-							</button>
-						</div>
-					)}
+		<div className='space-y-6 sm:px-30'>
+			<div className='space-y-2'>
+				<h2 className='text-lg font-medium text-foreground'>
+					Customer Information
+				</h2>
+			</div>
 
-					<Input
-						placeholder='hello@example.com'
-						type='email'
-						disabled={isAuthenticated}
-						{...form.register('email')}
+			<div className='w-full h-12 rounded-xl border-3 border-gray-200 px-2 text-sm flex items-center'>
+				{userEmail || "You're not logged in"}
+			</div>
+
+			<div className='space-y-2'>
+				<h2 className='text-lg font-medium text-foreground'>Shipping Address</h2>
+			</div>
+
+			<Form {...form}>
+				<form className='grid grid-cols-2 gap-4'>
+					<FormField
+						control={form.control}
+						name='firstName'
+						render={({ field }) => (
+							<FormItem className='col-span-2'>
+								<FormControl>
+									<Input
+										placeholder='First name'
+										type='text'
+										{...field}
+										className='h-12 rounded-xl border-gray-200'
+									/>
+								</FormControl>
+								<FormMessage />
+							</FormItem>
+						)}
 					/>
-					{form.formState.errors.email && (
-						<p className='text-sm text-red-500 mt-1'>
-							{form.formState.errors.email.message}
-						</p>
-					)}
-				</div>
 
-				<div>
-					<h3 className='text-sm font-medium text-gray-700 mb-3'>
-						Shipping Address
-					</h3>
-					<div className='space-y-4'>
-						<div className='grid grid-cols-2 gap-4'>
-							<div>
-								<Input placeholder='First name' {...form.register('firstName')} />
-								{form.formState.errors.firstName && (
-									<p className='text-sm text-red-500 mt-1'>
-										{form.formState.errors.firstName.message}
-									</p>
-								)}
-							</div>
-							<div>
-								<Input placeholder='Last name' {...form.register('lastName')} />
-								{form.formState.errors.lastName && (
-									<p className='text-sm text-red-500 mt-1'>
-										{form.formState.errors.lastName.message}
-									</p>
-								)}
-							</div>
-						</div>
+					<FormField
+						control={form.control}
+						name='lastName'
+						render={({ field }) => (
+							<FormItem className='col-span-2'>
+								<FormControl>
+									<Input
+										placeholder='Last name'
+										type='text'
+										{...field}
+										className='h-12 rounded-xl border-gray-200'
+									/>
+								</FormControl>
+								<FormMessage />
+							</FormItem>
+						)}
+					/>
 
-						<div className='flex gap-3'>
-							<div className='flex items-center justify-center h-12 px-4 bg-gray-100 rounded-xl text-sm font-medium'>
-								+1
-							</div>
-							<div className='flex-1'>
-								<Input placeholder='Phone number' {...form.register('phone')} />
-								{form.formState.errors.phone && (
-									<p className='text-sm text-red-500 mt-1'>
-										{form.formState.errors.phone.message}
-									</p>
-								)}
-							</div>
-						</div>
+					<FormField
+						control={form.control}
+						name='phone'
+						render={({ field }) => (
+							<FormItem className='col-span-2'>
+								<FormControl>
+									<Input
+										placeholder='Phone'
+										type='tel'
+										{...field}
+										className='h-12 rounded-xl border-gray-200'
+									/>
+								</FormControl>
+								<FormMessage />
+							</FormItem>
+						)}
+					/>
 
-						<div>
-							<Input placeholder='Address' {...form.register('address')} />
-							{form.formState.errors.address && (
-								<p className='text-sm text-red-500 mt-1'>
-									{form.formState.errors.address.message}
-								</p>
-							)}
-						</div>
+					<FormField
+						control={form.control}
+						name='address'
+						render={({ field }) => (
+							<FormItem className='col-span-2'>
+								<FormControl>
+									<Input
+										placeholder='Address'
+										type='text'
+										{...field}
+										className='h-12 rounded-xl border-gray-200'
+									/>
+								</FormControl>
+								<FormMessage />
+							</FormItem>
+						)}
+					/>
 
-						<div className='grid grid-cols-2 gap-4'>
-							<div>
-								<Input placeholder='City' {...form.register('city')} />
-								{form.formState.errors.city && (
-									<p className='text-sm text-red-500 mt-1'>
-										{form.formState.errors.city.message}
-									</p>
-								)}
-							</div>
-							<div>
-								<Input placeholder='Country' {...form.register('country')} />
-								{form.formState.errors.country && (
-									<p className='text-sm text-red-500 mt-1'>
-										{form.formState.errors.country.message}
-									</p>
-								)}
-							</div>
-						</div>
-					</div>
-				</div>
-			</form>
+					<FormField
+						control={form.control}
+						name='city'
+						render={({ field }) => (
+							<FormItem className='col-span-1'>
+								<FormControl>
+									<Input
+										placeholder='City'
+										type='text'
+										{...field}
+										className='h-12 rounded-xl border-gray-200'
+									/>
+								</FormControl>
+								<FormMessage />
+							</FormItem>
+						)}
+					/>
+
+					<FormField
+						control={form.control}
+						name='country'
+						render={({ field }) => (
+							<FormItem className='col-span-1'>
+								<FormControl>
+									<Input
+										placeholder='Country'
+										type='text'
+										{...field}
+										className='h-12 rounded-xl border-gray-200'
+									/>
+								</FormControl>
+								<FormMessage />
+							</FormItem>
+						)}
+					/>
+				</form>
+			</Form>
 		</div>
 	);
 }

@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { User, Package, Settings, LogOut } from 'lucide-react';
 import {
 	DropdownMenu,
@@ -21,30 +20,43 @@ type AuthView =
 	| 'forgot-password'
 	| 'reset-password';
 
+interface AppUserProps {
+	isAuthenticated: boolean;
+	user: User | null;
+	isAuthDrawerOpen: boolean;
+	setIsAuthDrawerOpen: (open: boolean) => void;
+	authView: AuthView;
+	setAuthView: (view: AuthView) => void;
+	onAuthSuccess: () => void;
+}
+
 export default function AppUser({
 	isAuthenticated,
 	user,
-}: {
-	isAuthenticated: boolean;
-	user: User | null;
-}) {
+	isAuthDrawerOpen,
+	setIsAuthDrawerOpen,
+	authView,
+	setAuthView,
+	onAuthSuccess,
+}: AppUserProps) {
 	const logout = useAuthStore((state) => state.logout);
-
-	// Single drawer state managed at this level
-	const [isDrawerOpen, setIsDrawerOpen] = useState(false);
-	const [authView, setAuthView] = useState<AuthView>('login');
 
 	const openDrawer = (view: AuthView) => {
 		setAuthView(view);
-		setIsDrawerOpen(true);
+		setIsAuthDrawerOpen(true);
 	};
 
 	const handleAuthSuccess = () => {
-		setIsDrawerOpen(false);
+		setIsAuthDrawerOpen(false);
 		setTimeout(() => setAuthView('login'), 300);
+		onAuthSuccess();
 	};
 
 	const handleLogout = async () => {
+		const isSure = window.confirm("Click OK if you're sure you want to logout");
+
+		if (!isSure) return;
+
 		try {
 			const message = await logout();
 
@@ -144,10 +156,10 @@ export default function AppUser({
 				</Button>
 			)}
 
-			{/* Single AuthDrawer instance that persists regardless of auth state */}
+			{/* AuthDrawer controlled by Header state */}
 			<AuthDrawer
-				open={isDrawerOpen}
-				onOpenChange={setIsDrawerOpen}
+				open={isAuthDrawerOpen}
+				onOpenChange={setIsAuthDrawerOpen}
 				defaultView={authView}
 				onSuccess={handleAuthSuccess}
 				userEmail={user?.email}

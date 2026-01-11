@@ -13,9 +13,3 @@ interface CartItem {
 	quantity: number;
 	subtotal: string;
 }
-
-interface AddToCartRequest {
-	product_id: number;
-	quantity: number;
-	color: string;
-}

@@ -1,55 +1,72 @@
 import { useCartStore } from '@/store/useCartStore';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import CartView from './cart-view';
 import { AppDrawer } from '../app-drawer';
 import CheckoutView, { CheckoutFormValues } from './checkout-view';
+import { useCheckoutStore } from '@/store/useCheckoutStore';
 
-type CheckoutView = 'cart' | 'checkout' | 'payment' | 'success';
+type CheckoutView =
+	| 'cart'
+	| 'validation'
+	| 'checkout'
+	| 'preview'
+	| 'payment'
+	| 'success';
 
 interface CheckoutDrawerProps {
 	open: boolean;
 	onOpenChange: (open: boolean) => void;
 	defaultView?: CheckoutView;
-	onSuccess?: () => void;
 	isAuthenticated?: boolean;
 	userEmail?: string;
+	onAuthRequired: () => void;
 }
+
+export type FooterActionSetterType = React.Dispatch<
+	React.SetStateAction<(() => void) | null>
+>;
 
 export function CheckoutDrawer({
 	open,
 	onOpenChange,
 	defaultView = 'cart',
-	onSuccess,
 	isAuthenticated = false,
 	userEmail = '',
+	onAuthRequired,
 }: CheckoutDrawerProps) {
 	const [currentView, setCurrentView] = useState<CheckoutView>(defaultView);
+	const [footerAction, setFooterAction] = useState<(() => void) | null>(null);
 	// const [shippingData, setShippingData] = useState(null);
 
 	const items = useCartStore((state) => state.items);
+	const session = useCheckoutStore((state) => state.session);
 
-	//   const handleUpdateQuantity = (id, newQuantity) => {
-	//     setItems(items.map(item =>
-	//       item.id === id ? { ...item, quantity: newQuantity } : item
-	//     ));
-	//   };
+	useEffect(() => {
+		if (session) {
+			setCurrentView('payment');
+		}
+	}, [session]);
 
 	const handleClose = () => {
 		onOpenChange(false);
 		setTimeout(() => setCurrentView(defaultView), 300);
 	};
 
-	const handleCheckoutSuccess = (data: CheckoutFormValues) => {
-		console.log(data);
-		// setShippingData(data);
-		// setCurrentView('payment');
+	const handleCheckoutAttempt = () => {
+		if (!isAuthenticated) {
+			onAuthRequired();
+			return;
+		}
+
+		setCurrentView('checkout');
 	};
 
-	//   const handlePaymentSuccess = (data) => {
-	//     console.log('Order completed:', { ...shippingData, ...data });
-	//     setCurrentView('success');
-	//     onSuccess?.();
-	//   };
+	// const canGoBack = currentView === 'checkout' || currentView === 'payment';
+
+	// const handleBack = () => {
+	// 	if (currentView === 'payment') setCurrentView('checkout');
+	// 	else if (currentView === 'checkout') setCurrentView('cart');
+	// };
 
 	const getTitle = () => {
 		switch (currentView) {
@@ -79,30 +96,36 @@ export function CheckoutDrawer({
 		}
 	};
 
-	// const canGoBack = currentView === 'checkout' || currentView === 'payment';
-
-	// const handleBack = () => {
-	// 	if (currentView === 'payment') setCurrentView('checkout');
-	// 	else if (currentView === 'checkout') setCurrentView('cart');
-	// };
+	const getFooterClick = () => {
+		if (footerAction) {
+			footerAction();
+		} else {
+			// Fallback behavior if no action is set
+			switch (currentView) {
+				case 'cart':
+					handleCheckoutAttempt();
+					break;
+				case 'checkout':
+					console.warn('No footer action set for checkout view');
+					break;
+				case 'payment':
+					console.warn('No footer action set for payment view');
+					break;
+			}
+		}
+	};
 
 	const renderContent = () => {
 		switch (currentView) {
 			case 'cart':
-				return (
-					<CartView
-						items={items}
-						// onUpdateQuantity={handleUpdateQuantity}
-						// onUpdateColor={handleUpdateColor}
-					/>
-				);
+				return <CartView items={items} />;
 
 			case 'checkout':
 				return (
 					<CheckoutView
-						onSuccess={handleCheckoutSuccess}
-						isAuthenticated={isAuthenticated}
 						userEmail={userEmail}
+						setFooterAction={setFooterAction}
+						next={() => setCurrentView('payment')}
 					/>
 				);
 			case 'payment':
@@ -116,6 +139,12 @@ export function CheckoutDrawer({
 		}
 	};
 
+	const shouldShowFooterButton =
+		(currentView === 'cart' ||
+			currentView === 'checkout' ||
+			currentView === 'payment') &&
+		items.length !== 0;
+
 	return (
 		<AppDrawer
 			title={getTitle()}
@@ -123,17 +152,15 @@ export function CheckoutDrawer({
 			onOpenChange={onOpenChange}
 			onClose={handleClose}
 			footerButton={
-				(currentView === 'cart' ||
-					currentView === 'checkout' ||
-					currentView === 'payment') &&
-				items.length !== 0
-					? { label: getButtonLabel(), onClick: () => setCurrentView('checkout') }
+				shouldShowFooterButton
+					? { label: getButtonLabel(), onClick: getFooterClick }
 					: undefined
 			}
-			//   showBackButton={canGoBack}
-			//   onBack={handleBack}
 		>
 			{renderContent()}
 		</AppDrawer>
 	);
 }
+
+//   showBackButton={canGoBack}
+//   onBack={handleBack}

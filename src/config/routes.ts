@@ -52,6 +52,9 @@ const routes = {
 			remove: (productId: number) => `/api/cart/items/${productId}`,
 			clear: '/cart',
 		},
+		checkout: {
+			make: '/api/checkout',
+		},
 	},
 };
 

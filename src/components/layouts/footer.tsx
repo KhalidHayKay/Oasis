@@ -1,7 +1,10 @@
+'use client';
+
 import Link from 'next/link';
 import { ArrowUp } from 'lucide-react';
 import { Fragment } from 'react/jsx-runtime';
 import Logo from '../logo';
+import { Button } from '../ui/button';
 
 export function Footer({
 	navLinks,
@@ -10,7 +13,7 @@ export function Footer({
 }) {
 	return (
 		<footer className='mt-20 bg-grey-900 text-slate-50'>
-			<div className='px-10 py-20 sm:px-10 lg:px-20'>
+			<div className='px-2 py-20 sm:px-6 lg:px-12'>
 				<div className='grid gap-x-20 md:grid-cols-[auto_auto_auto_auto] items-end'>
 					<div className='flex flex-col gap-y-15 md:gap-y-30'>
 						<Logo secondary />
@@ -71,12 +74,13 @@ export function Footer({
 					</div>
 
 					<div className='flex flex-col gap-y-15 md:gap-y-35 items-end'>
-						<Link
-							href={'#'}
+						<Button
+							variant='ghost'
+							onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
 							className='size-10 rounded-full flex items-center justify-center bg-grey-100'
 						>
 							<ArrowUp className='text-accent-foreground' />
-						</Link>
+						</Button>
 						<p className='text-xs text-slate-400'>© 2025 - Copyright</p>
 					</div>
 				</div>

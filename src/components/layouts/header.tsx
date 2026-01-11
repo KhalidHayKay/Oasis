@@ -12,6 +12,14 @@ import { Skeleton } from '../ui/skeleton';
 import Logo from '../logo';
 import { CheckoutDrawer } from '../checkout/checkout-drawer';
 import { useCartStore } from '@/store/useCartStore';
+import { toast } from 'sonner';
+
+type AuthView =
+	| 'login'
+	| 'signup'
+	| 'verify-email'
+	| 'forgot-password'
+	| 'reset-password';
 
 export function Header({
 	navLinks,
@@ -22,6 +30,11 @@ export function Header({
 
 	const [scrollDepth, setScrollDepth] = useState(0);
 	const [isCartOpen, setIsCartOpen] = useState(false);
+
+	// Auth drawer state
+	const [isAuthDrawerOpen, setIsAuthDrawerOpen] = useState(false);
+	const [authView, setAuthView] = useState<AuthView>('login');
+	const [pendingCheckout, setPendingCheckout] = useState(false);
 
 	const isInitiatingAuth = useAuthStore((state) => state.isInitiatingAuth);
 	const user = useAuthStore((state) => state.user);
@@ -41,6 +54,32 @@ export function Header({
 			window.removeEventListener('scroll', handleWindowScroll);
 		};
 	}, []);
+
+	// Handles auth success - reopen checkout if user was trying to checkout
+	const handleAuthSuccess = () => {
+		setIsAuthDrawerOpen(false);
+
+		if (pendingCheckout) {
+			setPendingCheckout(false);
+
+			setTimeout(() => {
+				setIsCartOpen(true);
+			}, 300);
+		}
+	};
+
+	// Handles when checkout requires authentication
+	const handleAuthRequired = () => {
+		setPendingCheckout(true);
+		setIsCartOpen(false);
+		setAuthView('login');
+
+		toast('You need to be authenticated');
+
+		setTimeout(() => {
+			setIsAuthDrawerOpen(true);
+		}, 300);
+	};
 
 	return (
 		<header
@@ -97,7 +136,15 @@ export function Header({
 						{isInitiatingAuth ? (
 							<Skeleton className='w-8 h-8 rounded-full bg-brand-100' />
 						) : (
-							<AppUser isAuthenticated={isAuthenticated} user={user} />
+							<AppUser
+								isAuthenticated={isAuthenticated}
+								user={user}
+								isAuthDrawerOpen={isAuthDrawerOpen}
+								setIsAuthDrawerOpen={setIsAuthDrawerOpen}
+								authView={authView}
+								setAuthView={setAuthView}
+								onAuthSuccess={handleAuthSuccess}
+							/>
 						)}
 					</div>
 				</div>
@@ -128,9 +175,9 @@ export function Header({
 				open={isCartOpen}
 				onOpenChange={setIsCartOpen}
 				defaultView='cart'
-				onSuccess={() => console.log('object')}
 				isAuthenticated={isAuthenticated}
 				userEmail={user?.email}
+				onAuthRequired={handleAuthRequired}
 			/>
 		</header>
 	);

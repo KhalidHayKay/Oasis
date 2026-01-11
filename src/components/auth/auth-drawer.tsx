@@ -110,7 +110,7 @@ export function AuthDrawer({
 				);
 
 			default:
-				return <span>No auth content set</span>;
+				return <span>No auth view set</span>;
 		}
 	};
 
