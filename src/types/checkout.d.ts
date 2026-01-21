@@ -9,13 +9,13 @@ interface ShippingAddress {
 
 interface CheckoutSession {
 	id: number;
-	public_token: string;
-	customer_email: string;
-	user_id: number;
-	cart_id: number;
-	shipping_address: ShippingAddress;
+	publicToken: string;
+	customerEmail: string;
+	userId: number;
+	cartId: number;
+	shippingAddress: ShippingAddress;
 	status: string;
-	expires_at: string;
-	created_at: string;
-	updated_at: string;
+	expiresAt: string;
+	createdAt: string;
+	updatedAt: string;
 }

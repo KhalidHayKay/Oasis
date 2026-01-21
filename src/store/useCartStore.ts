@@ -15,7 +15,7 @@ interface CartState {
 	addItem: (
 		product: ProductDetails,
 		quantity: number,
-		color: string
+		color: string,
 	) => Promise<void>;
 	removeItem: (id: number) => Promise<void>;
 	updateQuantity: (item: CartItem, quantity: number) => Promise<void>;
@@ -58,7 +58,7 @@ export const useCartStore = create<CartState>()(
 
 					try {
 						const item = await cartService.add({
-							product_id: product.id,
+							productId: product.id,
 							quantity,
 							color,
 						});
@@ -79,7 +79,7 @@ export const useCartStore = create<CartState>()(
 				set((state) => {
 					const existingItemIndex = state.items.findIndex(
 						(existingItem) =>
-							existingItem.productId === product.id && existingItem.color === color
+							existingItem.productId === product.id && existingItem.color === color,
 					);
 
 					if (existingItemIndex > -1) {
@@ -144,12 +144,12 @@ export const useCartStore = create<CartState>()(
 						if (quantity > item.quantity) {
 							updatedItem = await cartService.incrementItemQuantity(
 								item.id,
-								quantity - item.quantity
+								quantity - item.quantity,
 							);
 						} else if (quantity < item.quantity) {
 							updatedItem = await cartService.decrementItemQuantity(
 								item.id,
-								item.quantity - quantity
+								item.quantity - quantity,
 							);
 						} else {
 							set({ isSyncing: false });
@@ -168,7 +168,7 @@ export const useCartStore = create<CartState>()(
 				} else {
 					set((state) => ({
 						items: state.items.map((i) =>
-							i.id === item.id ? { ...i, quantity } : i
+							i.id === item.id ? { ...i, quantity } : i,
 						),
 					}));
 				}
@@ -251,7 +251,7 @@ export const useCartStore = create<CartState>()(
 				const { items } = get();
 				return items.reduce(
 					(total, item) => total + Number(item.unitPrice) * item.quantity,
-					0
+					0,
 				);
 			},
 		}),
@@ -261,6 +261,6 @@ export const useCartStore = create<CartState>()(
 				items: state.items,
 				hasSyncedOnLogin: state.hasSyncedOnLogin,
 			}),
-		}
-	)
+		},
+	),
 );

@@ -1,7 +1,6 @@
 import { create } from 'zustand';
 import { authService } from '@/services/authService';
-import { useCartStore } from './useCartStore';
-import { toast } from 'sonner';
+import { authEvent } from '@/lib/events/authEvent';
 
 interface AuthState {
 	// State
@@ -19,7 +18,7 @@ interface AuthState {
 	initializeAuth: () => Promise<void>;
 }
 
-export const useAuthStore = create<AuthState>((set) => ({
+export const useAuthStore = create<AuthState>((set, get) => ({
 	// Initial state
 	user: null,
 	isAuthenticated: false,
@@ -31,32 +30,10 @@ export const useAuthStore = create<AuthState>((set) => ({
 
 		try {
 			const user = await authService.getUser();
-			if (user) {
-				set({ user, isAuthenticated: true });
 
-				const { loadCartFromBackend, hasSyncedOnLogin, syncGuestCartToBackend } =
-					useCartStore.getState();
+			authEvent.emit('initialized', user);
 
-				if (!hasSyncedOnLogin) {
-					syncGuestCartToBackend().catch((error) => {
-						console.error('Failed to load cart on auth init:', error);
-						toast.error('Failed to load cart. Please refresh the page.', {
-							duration: 2000,
-						});
-					});
-				} else {
-					loadCartFromBackend().catch((error) => {
-						console.error('Failed to load cart on auth init:', error);
-						toast.error(error.message, {
-							duration: 2000,
-						});
-					});
-				}
-			} else {
-				set({ isAuthenticated: false });
-			}
-
-			set({ isInitiatingAuth: false });
+			set({ user, isAuthenticated: true, isInitiatingAuth: false });
 		} catch {
 			set({ isAuthenticated: false, isInitiatingAuth: false });
 		}
@@ -70,15 +47,7 @@ export const useAuthStore = create<AuthState>((set) => ({
 				isAuthenticated: true,
 			});
 
-			useCartStore
-				.getState()
-				.syncGuestCartToBackend()
-				.catch((error) => {
-					console.error('Cart sync failed:', error);
-					toast.error('Cart sync failed. Please refresh the page.', {
-						duration: 2000,
-					});
-				});
+			authEvent.emit('login', response.user);
 
 			return response;
 		} catch (error) {
@@ -108,15 +77,7 @@ export const useAuthStore = create<AuthState>((set) => ({
 				isAuthenticated: true,
 			});
 
-			useCartStore
-				.getState()
-				.syncGuestCartToBackend()
-				.catch((error) => {
-					console.error('Cart sync failed:', error);
-					toast.error('Cart sync failed. Please refresh the page.', {
-						duration: 2000,
-					});
-				});
+			authEvent.emit('login', response.user);
 
 			return response;
 		} catch (error) {
@@ -149,8 +110,7 @@ export const useAuthStore = create<AuthState>((set) => ({
 		try {
 			const response = await authService.logout();
 
-			useCartStore.getState().resetSyncFlag();
-			useCartStore.setState({ items: [] });
+			authEvent.emit('logout', get().user);
 
 			return response.message;
 		} catch (error) {

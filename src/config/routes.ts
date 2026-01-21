@@ -53,7 +53,13 @@ const routes = {
 			clear: '/cart',
 		},
 		checkout: {
+			get: '/api/checkout',
+			validate: '/api/checkout/validate',
 			make: '/api/checkout',
+		},
+		order: {
+			make: '/api/orders',
+			payment: (orderId: string) => `/api/orders/${orderId}/payment`,
 		},
 	},
 };

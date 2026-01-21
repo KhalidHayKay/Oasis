@@ -3,16 +3,20 @@
 import { useEffect } from 'react';
 import { setLogout } from '@/lib/api/auth';
 import { useAuthStore } from '@/store/useAuthStore';
+import { mountAuthEventHandlers } from '@/lib/events/authEventHandler';
+
+let isSetup = false;
+if (!isSetup) {
+	mountAuthEventHandlers();
+	isSetup = true;
+}
 
 const AuthInitializer = ({ children }: { children: React.ReactNode }) => {
 	const initializeAuth = useAuthStore((state) => state.initializeAuth);
 	const logout = useAuthStore((state) => state.logout);
 
 	useEffect(() => {
-		// Initialize auth on mount
 		initializeAuth();
-
-		// Set logout function for axios interceptor
 		setLogout(logout);
 	}, [initializeAuth, logout]);
 

@@ -4,12 +4,13 @@ import CartView from './cart-view';
 import { AppDrawer } from '../app-drawer';
 import CheckoutView, { CheckoutFormValues } from './checkout-view';
 import { useCheckoutStore } from '@/store/useCheckoutStore';
+import CartSummaryView from './cart-summary-view';
 
 type CheckoutView =
 	| 'cart'
 	| 'validation'
 	| 'checkout'
-	| 'preview'
+	| 'summary'
 	| 'payment'
 	| 'success';
 
@@ -42,6 +43,7 @@ export function CheckoutDrawer({
 	const session = useCheckoutStore((state) => state.session);
 
 	useEffect(() => {
+		console.log(session);
 		if (session) {
 			setCurrentView('payment');
 		}
@@ -74,6 +76,8 @@ export function CheckoutDrawer({
 				return 'Cart';
 			case 'checkout':
 				return 'Checkout';
+			case 'summary':
+				return 'Cart Summary';
 			case 'payment':
 				return 'Payment';
 			case 'success':
@@ -125,7 +129,16 @@ export function CheckoutDrawer({
 					<CheckoutView
 						userEmail={userEmail}
 						setFooterAction={setFooterAction}
-						next={() => setCurrentView('payment')}
+						next={() => setCurrentView('summary')}
+					/>
+				);
+			case 'summary':
+				return (
+					<CartSummaryView
+						items={items}
+						checkoutSession={session}
+						setFooterAction={setFooterAction}
+						onNext={() => setCurrentView('payment')}
 					/>
 				);
 			case 'payment':
@@ -139,11 +152,7 @@ export function CheckoutDrawer({
 		}
 	};
 
-	const shouldShowFooterButton =
-		(currentView === 'cart' ||
-			currentView === 'checkout' ||
-			currentView === 'payment') &&
-		items.length !== 0;
+	const shouldShowFooterButton = currentView !== 'success' && items.length !== 0;
 
 	return (
 		<AppDrawer

@@ -34,13 +34,13 @@ interface CategoryTagResponse {
 
 interface CheckoutResponse {
 	success: boolean;
-	checkout_session: CheckoutSession;
+	checkoutSession: CheckoutSession;
 }
 
 // Requests
 
 interface AddToCartRequest {
-	product_id: number;
+	productId: number;
 	quantity: number;
 	color: string;
 }
