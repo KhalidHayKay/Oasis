@@ -50,12 +50,12 @@ const routes = {
 			decrementQuantity: (productId: number) =>
 				`/api/cart/items/${productId}/quantity/decrement`,
 			remove: (productId: number) => `/api/cart/items/${productId}`,
-			clear: '/cart',
+			clear: 'api/cart',
 		},
 		checkout: {
 			get: '/api/checkout',
-			validate: '/api/checkout/validate',
 			make: '/api/checkout',
+			address: '/api/checkout/address',
 		},
 		order: {
 			make: '/api/orders',

@@ -13,6 +13,7 @@ import Logo from '../logo';
 import { CheckoutDrawer } from '../checkout/checkout-drawer';
 import { useCartStore } from '@/store/useCartStore';
 import { toast } from 'sonner';
+import { useCheckoutStore } from '@/store/useCheckoutStore';
 
 type AuthView =
 	| 'login'
@@ -74,7 +75,7 @@ export function Header({
 		setIsCartOpen(false);
 		setAuthView('login');
 
-		toast('You need to be authenticated');
+		toast.error('You need to be authenticated');
 
 		setTimeout(() => {
 			setIsAuthDrawerOpen(true);
@@ -86,7 +87,7 @@ export function Header({
 			inert={false}
 			className={cn(
 				'fixed top-0 z-50 w-full bg-white transition-all duration-200',
-				scrollDepth >= 80 ? 'border-b border-grey-100 shadow-sm' : ''
+				scrollDepth >= 80 ? 'border-b border-grey-100 shadow-sm' : '',
 			)}
 		>
 			<div className='px-2 sm:px-6 lg:px-12'>
@@ -103,7 +104,7 @@ export function Header({
 									'text-sm font-medium transition-colors hover:text-grey-900 relative',
 									activeNav.toLowerCase() === link.label.toLowerCase()
 										? 'text-grey-900'
-										: 'text-grey-500'
+										: 'text-grey-500',
 								)}
 							>
 								{link.label.toUpperCase()}
@@ -159,7 +160,7 @@ export function Header({
 								'text-sm font-medium transition-colors relative',
 								activeNav.toLowerCase() === link.label.toLowerCase()
 									? 'text-grey-900'
-									: 'text-grey-500'
+									: 'text-grey-500',
 							)}
 						>
 							{link.label.toUpperCase()}
@@ -174,8 +175,6 @@ export function Header({
 			<CheckoutDrawer
 				open={isCartOpen}
 				onOpenChange={setIsCartOpen}
-				defaultView='cart'
-				isAuthenticated={isAuthenticated}
 				userEmail={user?.email}
 				onAuthRequired={handleAuthRequired}
 			/>

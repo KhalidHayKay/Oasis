@@ -9,14 +9,13 @@ import {
 	FormMessage,
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import { Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
-import { FooterActionSetterType } from './checkout-drawer';
+import { FooterButtonSetterType } from './checkout-drawer';
 import { useEffect, useCallback } from 'react';
 import { useCheckoutStore } from '@/store/useCheckoutStore';
 
-const checkoutSchema = z.object({
-	email: z.string().email('Invalid email address').max(255, 'Email is too long'),
+const AddressSchema = z.object({
+	email: z.email('Invalid email address').max(255, 'Email is too long'),
 	firstName: z
 		.string()
 		.min(1, 'First name is required')
@@ -40,17 +39,21 @@ const checkoutSchema = z.object({
 		.max(100, 'Country is too long'),
 });
 
-export type CheckoutFormValues = z.infer<typeof checkoutSchema>;
+export type CheckoutFormValues = z.infer<typeof AddressSchema>;
 
-interface CheckoutFormProps {
+interface ShippingAddressViewProps {
 	userEmail: string;
-	setFooterAction: FooterActionSetterType;
+	setFooterButton: FooterButtonSetterType;
 	next: () => void;
 }
 
-function CheckoutView({ userEmail, setFooterAction, next }: CheckoutFormProps) {
+const ShippingAddressView = ({
+	userEmail,
+	setFooterButton,
+	next,
+}: ShippingAddressViewProps) => {
 	const form = useForm<CheckoutFormValues>({
-		resolver: zodResolver(checkoutSchema),
+		resolver: zodResolver(AddressSchema),
 		defaultValues: {
 			email: userEmail || '',
 			firstName: '',
@@ -62,27 +65,26 @@ function CheckoutView({ userEmail, setFooterAction, next }: CheckoutFormProps) {
 		},
 	});
 
-	const checkout = useCheckoutStore((state) => state.checkout);
+	const setShippingAddress = useCheckoutStore((state) => state.addAddress);
 
 	const onSubmit = useCallback(async (values: CheckoutFormValues) => {
-		const data: CheckoutRequest = {
+		const data: Address = {
 			shipping_fname: values.firstName,
 			shipping_lname: values.lastName,
 			shipping_phone: values.phone,
 			shipping_address: values.address,
+			shipping_country: values.country,
 			shipping_city: values.city,
-			shipping_state: values.city,
-			shipping_lga: values.country,
 		};
 
 		try {
-			await checkout(data);
+			await setShippingAddress(data);
 			next();
 		} catch (error) {
 			const message =
 				error instanceof Error
 					? error.message
-					: 'Unable to check out. Please try again';
+					: 'An error occured while trying to add address';
 			toast.error(message);
 		}
 	}, []);
@@ -93,13 +95,16 @@ function CheckoutView({ userEmail, setFooterAction, next }: CheckoutFormProps) {
 			form.handleSubmit(onSubmit)();
 		};
 
-		setFooterAction(() => handleFormSubmit);
+		setFooterButton({
+			label: 'Next',
+			action: handleFormSubmit,
+		});
 
-		return () => setFooterAction(null);
-	}, [setFooterAction, form, onSubmit]);
+		return () => setFooterButton(null);
+	}, [setFooterButton, form, onSubmit]);
 
 	return (
-		<div className='space-y-6 sm:px-30'>
+		<div className='space-y-6'>
 			<div className='space-y-2'>
 				<h2 className='text-lg font-medium text-foreground'>
 					Customer Information
@@ -227,5 +232,5 @@ function CheckoutView({ userEmail, setFooterAction, next }: CheckoutFormProps) {
 			</Form>
 		</div>
 	);
-}
-export default CheckoutView;
+};
+export default ShippingAddressView;

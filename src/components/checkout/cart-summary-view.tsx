@@ -1,22 +1,22 @@
 import { useEffect, useState } from 'react';
-import { FooterActionSetterType } from './checkout-drawer';
+import { FooterButtonSetterType } from './checkout-drawer';
 
 interface CartSummaryViewProps {
 	items: CartItem[];
 	checkoutSession: CheckoutSession | null;
-	setFooterAction: FooterActionSetterType;
-	onNext: () => void;
+	setFooterButton: FooterButtonSetterType;
+	next: () => void;
 }
 
 const CartSummaryView = ({
 	items,
 	checkoutSession,
-	setFooterAction,
-	onNext,
+	setFooterButton,
+	next,
 }: CartSummaryViewProps) => {
 	const subtotal = items.reduce(
 		(sum, item) => sum + Number(item.unitPrice) * item.quantity,
-		0
+		0,
 	);
 
 	// Countdown timer logic

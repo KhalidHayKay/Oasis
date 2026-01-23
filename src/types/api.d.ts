@@ -40,7 +40,7 @@ interface CheckoutResponse {
 // Requests
 
 interface AddToCartRequest {
-	productId: number;
+	product_id: number;
 	quantity: number;
 	color: string;
 }
@@ -50,9 +50,10 @@ interface Address {
 	shipping_lname: string;
 	shipping_phone: string;
 	shipping_address: string;
+	shipping_country: string;
 	shipping_city: string;
-	shipping_state: string;
-	shipping_lga: string;
 }
 
-interface CheckoutRequest extends Address {}
+interface CheckoutRequest extends Address {
+	checkout_token: string;
+}

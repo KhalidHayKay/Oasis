@@ -1,15 +1,15 @@
 import { useCartStore } from '@/store/useCartStore';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import CartView from './cart-view';
 import { AppDrawer } from '../app-drawer';
-import CheckoutView, { CheckoutFormValues } from './checkout-view';
 import { useCheckoutStore } from '@/store/useCheckoutStore';
 import CartSummaryView from './cart-summary-view';
+import ShippingAddressView from './shipping-address-view';
 
-type CheckoutView =
+export type CheckoutView =
 	| 'cart'
 	| 'validation'
-	| 'checkout'
+	| 'address'
 	| 'summary'
 	| 'payment'
 	| 'success';
@@ -18,50 +18,47 @@ interface CheckoutDrawerProps {
 	open: boolean;
 	onOpenChange: (open: boolean) => void;
 	defaultView?: CheckoutView;
-	isAuthenticated?: boolean;
 	userEmail?: string;
 	onAuthRequired: () => void;
 }
 
-export type FooterActionSetterType = React.Dispatch<
-	React.SetStateAction<(() => void) | null>
+export type FooterButton = {
+	label: string;
+	action: () => void;
+};
+
+export type FooterButtonSetterType = React.Dispatch<
+	React.SetStateAction<FooterButton | null>
+>;
+
+type ViewContentType = Record<
+	CheckoutView,
+	{
+		title: string;
+		render: () => React.ReactNode;
+	}
 >;
 
 export function CheckoutDrawer({
 	open,
 	onOpenChange,
-	defaultView = 'cart',
-	isAuthenticated = false,
 	userEmail = '',
 	onAuthRequired,
 }: CheckoutDrawerProps) {
-	const [currentView, setCurrentView] = useState<CheckoutView>(defaultView);
-	const [footerAction, setFooterAction] = useState<(() => void) | null>(null);
-	// const [shippingData, setShippingData] = useState(null);
+	const [currentView, setCurrentView] = useState<CheckoutView>('cart');
+	const [footerButton, setFooterButton] = useState<FooterButton | null>(null);
 
 	const items = useCartStore((state) => state.items);
 	const session = useCheckoutStore((state) => state.session);
 
-	useEffect(() => {
-		console.log(session);
-		if (session) {
-			setCurrentView('payment');
-		}
-	}, [session]);
-
 	const handleClose = () => {
 		onOpenChange(false);
-		setTimeout(() => setCurrentView(defaultView), 300);
 	};
 
-	const handleCheckoutAttempt = () => {
-		if (!isAuthenticated) {
-			onAuthRequired();
-			return;
-		}
-
-		setCurrentView('checkout');
-	};
+	// Memoize callbacks to prevent infinite rerenders
+	const handleAddressNext = useCallback(() => setCurrentView('address'), []);
+	const handleSummaryNext = useCallback(() => setCurrentView('payment'), []);
+	const handleCheckoutNext = useCallback(() => setCurrentView('summary'), []);
 
 	// const canGoBack = currentView === 'checkout' || currentView === 'payment';
 
@@ -70,103 +67,81 @@ export function CheckoutDrawer({
 	// 	else if (currentView === 'checkout') setCurrentView('cart');
 	// };
 
-	const getTitle = () => {
-		switch (currentView) {
-			case 'cart':
-				return 'Cart';
-			case 'checkout':
-				return 'Checkout';
-			case 'summary':
-				return 'Cart Summary';
-			case 'payment':
-				return 'Payment';
-			case 'success':
-				return '';
-			default:
-				return 'Cart';
+	useEffect(() => {
+		if (session?.currentStep) {
+			setCurrentView(session.currentStep as CheckoutView);
 		}
+	}, [session?.currentStep]);
+
+	// Reset drawer state when it closes
+	useEffect(() => {
+		if (!open) {
+			setFooterButton(null);
+		}
+	}, [open]);
+
+	const viewContent: ViewContentType = {
+		cart: {
+			title: 'Cart',
+			render: () => (
+				<CartView
+					items={items}
+					setFooterButton={setFooterButton}
+					onAuthRequired={onAuthRequired}
+					next={handleAddressNext}
+				/>
+			),
+		},
+		validation: {
+			title: 'Validation',
+			render: () => null,
+		},
+		address: {
+			title: 'Checkout',
+			render: () => (
+				<ShippingAddressView
+					userEmail={userEmail}
+					setFooterButton={setFooterButton}
+					next={handleCheckoutNext}
+				/>
+			),
+		},
+		summary: {
+			title: 'Order summary',
+			render: () => (
+				<CartSummaryView
+					items={items}
+					checkoutSession={session}
+					setFooterButton={setFooterButton}
+					next={handleSummaryNext}
+				/>
+			),
+		},
+		payment: {
+			title: 'Payment',
+			render: () => null, // <PaymentView onSuccess={handlePaymentSuccess} />
+		},
+		success: {
+			title: '',
+			render: () => null, // <SuccessView />
+		},
 	};
 
-	const getButtonLabel = () => {
-		switch (currentView) {
-			case 'cart':
-				return 'Next';
-			case 'checkout':
-				return 'Proceed to Payment';
-			case 'payment':
-				return 'Pay Now';
-			default:
-				return 'Continue';
-		}
-	};
-
-	const getFooterClick = () => {
-		if (footerAction) {
-			footerAction();
-		} else {
-			// Fallback behavior if no action is set
-			switch (currentView) {
-				case 'cart':
-					handleCheckoutAttempt();
-					break;
-				case 'checkout':
-					console.warn('No footer action set for checkout view');
-					break;
-				case 'payment':
-					console.warn('No footer action set for payment view');
-					break;
-			}
-		}
-	};
-
-	const renderContent = () => {
-		switch (currentView) {
-			case 'cart':
-				return <CartView items={items} />;
-
-			case 'checkout':
-				return (
-					<CheckoutView
-						userEmail={userEmail}
-						setFooterAction={setFooterAction}
-						next={() => setCurrentView('summary')}
-					/>
-				);
-			case 'summary':
-				return (
-					<CartSummaryView
-						items={items}
-						checkoutSession={session}
-						setFooterAction={setFooterAction}
-						onNext={() => setCurrentView('payment')}
-					/>
-				);
-			case 'payment':
-				return ''; // <PaymentView onSuccess={handlePaymentSuccess} />;
-
-			case 'success':
-				return ''; // <SuccessView />;
-
-			default:
-				return ''; // <div>Unknown view</div>;
-		}
-	};
-
-	const shouldShowFooterButton = currentView !== 'success' && items.length !== 0;
+	const currentViewConfig = viewContent[currentView];
 
 	return (
 		<AppDrawer
-			title={getTitle()}
+			title={currentViewConfig.title}
 			open={open}
 			onOpenChange={onOpenChange}
 			onClose={handleClose}
 			footerButton={
-				shouldShowFooterButton
-					? { label: getButtonLabel(), onClick: getFooterClick }
+				footerButton
+					? { label: footerButton.label, onClick: footerButton.action }
 					: undefined
 			}
 		>
-			{renderContent()}
+			{currentViewConfig.render()}
 		</AppDrawer>
 	);
 }

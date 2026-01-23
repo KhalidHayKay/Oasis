@@ -58,7 +58,7 @@ export const useCartStore = create<CartState>()(
 
 					try {
 						const item = await cartService.add({
-							productId: product.id,
+							product_id: product.id,
 							quantity,
 							color,
 						});

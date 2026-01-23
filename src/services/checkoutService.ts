@@ -3,13 +3,20 @@ import { http } from '@/lib/api/http';
 
 export const checkoutService = {
 	async get() {
-		const response = await http.get<CheckoutSession>(routes.api.checkout.get);
+		const response = await http.get<{ data: CheckoutSession }>(
+			routes.api.checkout.get,
+		);
+		return response.data;
+	},
+
+	async create() {
+		const response = await http.post<CheckoutResponse>(routes.api.checkout.make);
 		return response;
 	},
 
-	async create(data: CheckoutRequest) {
+	async address(data: CheckoutRequest) {
 		const response = await http.post<CheckoutResponse>(
-			routes.api.checkout.make,
+			routes.api.checkout.address,
 			data,
 		);
 		return response;

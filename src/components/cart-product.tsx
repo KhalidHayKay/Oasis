@@ -1,8 +1,10 @@
 import { useCartStore } from '@/store/useCartStore';
+import { Trash, X } from 'lucide-react';
 import Image from 'next/image';
 
 const CartProduct = ({ item }: { item: CartItem }) => {
 	const updateQuantity = useCartStore((state) => state.updateQuantity);
+	const removeItem = useCartStore((state) => state.removeItem);
 
 	const { productName, productDesc, productImage, unitPrice, color, quantity } =
 		item;
@@ -15,8 +17,21 @@ const CartProduct = ({ item }: { item: CartItem }) => {
 		await updateQuantity(item, item.quantity - 1);
 	};
 
+	const handleRemove = async () => {
+		await removeItem(item.id);
+	};
+
 	return (
-		<div className='grid grid-cols-[1fr_2fr] items-center gap-x-5'>
+		<div className='grid grid-cols-[1fr_2fr] items-center gap-x-5 relative'>
+			{/* Remove Button */}
+			<button
+				onClick={handleRemove}
+				className='hidden sm:block absolute top-1.5 right-0 z-10 size-4 text-grey-800 transition-colors'
+				aria-label='Remove item'
+			>
+				<Trash className='size-full' />
+			</button>
+
 			<div className='relative bg-muted rounded-lg overflow-hidden aspect-square flex items-center justify-center h-full w-full'>
 				<Image
 					width={600}
@@ -39,34 +54,41 @@ const CartProduct = ({ item }: { item: CartItem }) => {
 					</span>
 				</div>
 
-				<div className='flex flex-row products-center justify-between py-3'>
-					{/* Color Selection */}
-					<div className='flex flex-col gap-3'>
+				<div className='flex flex-row items-center justify-between py-3'>
+					<div className='flex flex-row-reverse items-center gap-3'>
 						<button
 							className='size-5 rounded-xl border-2 transition-all border-border'
 							style={{ backgroundColor: color }}
 						/>
+						{/* Quantity Selector */}
+						<div className='flex border border-border rounded-lg'>
+							<button
+								onClick={handleDecrement}
+								className='px-2 py-1 hover:bg-muted transition-colors'
+								aria-label='Decrease quantity'
+							>
+								−
+							</button>
+							<span className='px-2 py-1 min-w-7 text-center font-medium'>
+								{quantity}
+							</span>
+							<button
+								onClick={handleIncrement}
+								className='px-2 py-1 hover:bg-muted transition-colors'
+								aria-label='Increase quantity'
+							>
+								+
+							</button>
+						</div>
 					</div>
-					{/* Quantity Selector */}
-					<div className='flex border border-border rounded-lg'>
-						<button
-							onClick={handleDecrement}
-							className='px-2 py-1 hover:bg-muted transition-colors'
-							aria-label='Decrease quantity'
-						>
-							−
-						</button>
-						<span className='px-2 py-1 min-w-7 text-center font-medium'>
-							{quantity}
-						</span>
-						<button
-							onClick={handleIncrement}
-							className='px-2 py-1 hover:bg-muted transition-colors'
-							aria-label='Increase quantity'
-						>
-							+
-						</button>
-					</div>
+
+					<button
+						onClick={handleRemove}
+						className='sm:hidden z-10 size-4 text-grey-800 transition-colors'
+						aria-label='Remove item'
+					>
+						<Trash className='size-full' />
+					</button>
 				</div>
 			</div>
 		</div>

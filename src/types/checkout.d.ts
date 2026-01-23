@@ -15,6 +15,7 @@ interface CheckoutSession {
 	cartId: number;
 	shippingAddress: ShippingAddress;
 	status: string;
+	currentStep: 'cart' | 'checkout' | 'address' | 'payment' | 'summary';
 	expiresAt: string;
 	createdAt: string;
 	updatedAt: string;
