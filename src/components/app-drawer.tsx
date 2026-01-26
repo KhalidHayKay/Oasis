@@ -54,7 +54,7 @@ export function AppDrawer({
 					<DrawerHeader className='flex-row justify-center'>
 						<DrawerTitle className='text-2xl font-semibold'>{title}</DrawerTitle>
 					</DrawerHeader>
-					<div className='mt-15 -mb-5 h-[calc(100vh-200px)]'>
+					<div className='mt-10 -mb-5 h-[calc(100vh-200px)]'>
 						<div className='pt-2 flex flex-col gap-y-10 overflow-y-auto min-h-full max-h-full scrollbar-hide'>
 							{children}
 						</div>

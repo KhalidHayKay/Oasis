@@ -37,6 +37,12 @@ interface CheckoutResponse {
 	checkoutSession: CheckoutSession;
 }
 
+interface PaymentIntentResponse {
+	checkoutSession: CheckoutSession;
+	clientSecret: string;
+	reference: string;
+}
+
 // Requests
 
 interface AddToCartRequest {

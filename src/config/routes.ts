@@ -56,6 +56,7 @@ const routes = {
 			get: '/api/checkout',
 			make: '/api/checkout',
 			address: '/api/checkout/address',
+			'payment-intent': 'api/checkout/payment-intent',
 		},
 		order: {
 			make: '/api/orders',

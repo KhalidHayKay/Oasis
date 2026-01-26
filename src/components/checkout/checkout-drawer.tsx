@@ -3,8 +3,9 @@ import { useEffect, useState, useCallback } from 'react';
 import CartView from './cart-view';
 import { AppDrawer } from '../app-drawer';
 import { useCheckoutStore } from '@/store/useCheckoutStore';
-import CartSummaryView from './cart-summary-view';
+import OrderSummaryView from './order-summary-view';
 import ShippingAddressView from './shipping-address-view';
+import PaymentCardView from './payment-view';
 
 export type CheckoutView =
 	| 'cart'
@@ -57,8 +58,9 @@ export function CheckoutDrawer({
 
 	// Memoize callbacks to prevent infinite rerenders
 	const handleAddressNext = useCallback(() => setCurrentView('address'), []);
-	const handleSummaryNext = useCallback(() => setCurrentView('payment'), []);
-	const handleCheckoutNext = useCallback(() => setCurrentView('summary'), []);
+	const handleSummaryNext = useCallback(() => setCurrentView('summary'), []);
+	const handlePaymentNext = useCallback(() => setCurrentView('payment'), []);
+	const handlePaid = useCallback(() => setCurrentView('success'), []);
 
 	// const canGoBack = currentView === 'checkout' || currentView === 'payment';
 
@@ -102,24 +104,29 @@ export function CheckoutDrawer({
 				<ShippingAddressView
 					userEmail={userEmail}
 					setFooterButton={setFooterButton}
-					next={handleCheckoutNext}
+					next={handleSummaryNext}
 				/>
 			),
 		},
 		summary: {
 			title: 'Order summary',
 			render: () => (
-				<CartSummaryView
-					items={items}
-					checkoutSession={session}
+				<OrderSummaryView
+					checkoutSession={session as CheckoutSession}
 					setFooterButton={setFooterButton}
-					next={handleSummaryNext}
+					next={handlePaymentNext}
 				/>
 			),
 		},
 		payment: {
 			title: 'Payment',
-			render: () => null, // <PaymentView onSuccess={handlePaymentSuccess} />
+			render: () => (
+				<PaymentCardView
+					checkoutSession={session as CheckoutSession}
+					setFooterButton={setFooterButton}
+					next={handlePaid}
+				/>
+			),
 		},
 		success: {
 			title: '',

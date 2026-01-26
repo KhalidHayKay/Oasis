@@ -89,7 +89,6 @@ const ShippingAddressView = ({
 		}
 	}, []);
 
-	// Set the footer action when component mounts
 	useEffect(() => {
 		const handleFormSubmit = () => {
 			form.handleSubmit(onSubmit)();

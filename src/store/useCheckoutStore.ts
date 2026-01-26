@@ -1,18 +1,26 @@
 import { checkoutService } from '@/services/checkoutService';
+import { paymentService } from '@/services/paymentService';
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 
 interface CheckoutState {
 	session: CheckoutSession | null;
+	payment: {
+		clientSecret: string;
+		reference: string;
+	} | null;
 	getCheckoutSession: () => Promise<void>;
 	checkout: () => Promise<void>;
 	addAddress: (address: Address) => Promise<void>;
+	intendPayment: (checkoutToken: string) => Promise<void>;
+	makePayment: () => Promise<void>;
 }
 
 export const useCheckoutStore = create<CheckoutState>()(
 	persist(
 		(set, get) => ({
 			session: null,
+			payment: null,
 
 			getCheckoutSession: async () => {
 				try {
@@ -47,11 +55,26 @@ export const useCheckoutStore = create<CheckoutState>()(
 					throw error;
 				}
 			},
+
+			intendPayment: async (checkoutToken) => {
+				try {
+					const { checkoutSession, reference, clientSecret } =
+						await paymentService.intent(checkoutToken);
+					set({ session: checkoutSession, payment: { clientSecret, reference } });
+				} catch (error) {
+					throw error;
+				}
+			},
+
+			makePayment: async () => {
+				//
+			},
 		}),
 		{
 			name: 'checkout-store',
 			partialize: (state) => ({
 				session: state.session,
+				payment: state.payment,
 			}),
 		},
 	),
