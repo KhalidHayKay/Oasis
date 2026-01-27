@@ -19,22 +19,17 @@ import { useEffect, useCallback } from 'react';
 import type { FooterButtonSetterType } from './checkout-drawer';
 import { cn } from '@/lib/utils';
 import { useWatch } from 'react-hook-form';
+import StripeElement from '../stripe/stripe-element';
+import {
+	PaymentElement,
+	useElements,
+	useStripe,
+} from '@stripe/react-stripe-js';
+import { stripePromise } from '@/lib/utils/stripe';
+import { toast } from 'sonner';
 
 const paymentSchema = z
 	.object({
-		cardNumber: z
-			.string()
-			.min(13, 'Card number must be at least 13 digits')
-			.max(19, 'Card number must be at most 19 digits')
-			.regex(/^\d+$/, 'Card number must contain only digits'),
-		expiryDate: z
-			.string()
-			.regex(/^(0[1-9]|1[0-2])\/\d{2}$/, 'Expiry date must be in MM/YY format'),
-		cvv: z.string().regex(/^\d{3,4}$/, 'CVV must be 3 or 4 digits'),
-		nameOnCard: z
-			.string()
-			.min(2, 'Name must be at least 2 characters')
-			.max(50, 'Name must be at most 50 characters'),
 		useShipping: z.boolean(),
 
 		firstName: z.string().optional(),
@@ -108,10 +103,6 @@ const PaymentView = ({
 	const form = useForm<PaymentFormValues>({
 		resolver: zodResolver(paymentSchema),
 		defaultValues: {
-			cardNumber: '',
-			expiryDate: '',
-			cvv: '',
-			nameOnCard: '',
 			useShipping: true,
 
 			firstName: '',
@@ -123,30 +114,87 @@ const PaymentView = ({
 		},
 	});
 
-	const makePayment = useCheckoutStore((state) => state.makePayment);
+	const stripe = useStripe();
+	const elements = useElements();
+
+	const [isProcessing, setIsProcessing] = useState(false);
+
+	const confirmPayment = useCheckoutStore((state) => state.confirmPayment);
 
 	const useShippingValue = useWatch({
 		control: form.control,
 		name: 'useShipping',
 	});
 
-	const onSubmit = useCallback(async (values: PaymentFormValues) => {
-		console.log(values, checkoutSession);
-		// const reqData = {
-		// 		cardNumber: data.cardNumber,
-		// 		expiryDate: data.expiryDate,
-		// 		cvv: data.cvv,
-		// 		nameOnCard: data.nameOnCard,
-		// 		rememberMe: data.rememberMe,
-		// 	}
+	const onSubmit = useCallback(
+		async (values: PaymentFormValues) => {
+			if (!stripe || !elements) {
+				console.error('Stripe not loaded');
+				return;
+			}
 
-		try {
-			await makePayment();
-			// next();
-		} catch (error) {
-			console.error('Payment submission error:', error);
-		}
-	}, []);
+			setIsProcessing(true);
+
+			try {
+				// Build billing details
+				// const billingDetails = values.useShipping
+				// 	? {
+				// 			// Use shipping address from checkoutSession
+				// 			name: `${checkoutSession.shippingAddress.firstName} ${checkoutSession.shippingAddress.lastName}`,
+				// 			phone: checkoutSession.shippingAddress.phone,
+				// 			address: {
+				// 				line1: checkoutSession.shippingAddress.address,
+				// 				city: checkoutSession.shippingAddress.city,
+				// 				country: checkoutSession.shippingAddress.country,
+				// 				postal_code: '00000',
+				// 				state: 'N/A',
+				// 			},
+				// 		}
+				// 	: {
+				// 			// Use custom billing address
+				// 			name: `${values.firstName} ${values.lastName}`,
+				// 			phone: values.phone,
+				// 			address: {
+				// 				line1: values.address,
+				// 				city: values.city,
+				// 				country: values.country,
+				// 				postal_code: '00000',
+				// 				state: 'N/A',
+				// 			},
+				// 		};
+
+				// console.log(billingDetails);
+
+				// Submit payment to Stripe
+				const { error, paymentIntent } = await stripe.confirmPayment({
+					elements,
+					confirmParams: {
+						return_url: `${window.location.origin}/checkout/success`,
+					},
+					redirect: 'if_required', // Handle success in the same page
+				});
+
+				if (error) {
+					// Show error to user
+					console.error('Payment error:', error);
+					toast.error(error.message || 'Payment failed');
+				} else if (paymentIntent && paymentIntent.status === 'succeeded') {
+					// Payment successful
+					setInterval(async () => {
+						await confirmPayment();
+					}, 1000);
+					toast.success('Payment successful!');
+					next();
+				}
+			} catch (error) {
+				console.error('Payment submission error:', error);
+				toast.error('An error occurred during payment');
+			} finally {
+				setIsProcessing(false);
+			}
+		},
+		[stripe, elements, checkoutSession, confirmPayment, next],
+	);
 
 	useEffect(() => {
 		const handleFormSubmit = () => {
@@ -161,114 +209,34 @@ const PaymentView = ({
 		return () => setFooterButton(null);
 	}, [form, onSubmit, setFooterButton]);
 
-	const handleCardNumberInput = (e: React.ChangeEvent<HTMLInputElement>) => {
-		const value = e.target.value.replace(/\D/g, '').slice(0, 19);
-		form.setValue('cardNumber', value);
-	};
-
-	const handleExpiryInput = (e: React.ChangeEvent<HTMLInputElement>) => {
-		let value = e.target.value.replace(/\D/g, '').slice(0, 4);
-		if (value.length >= 2) {
-			value = value.slice(0, 2) + '/' + value.slice(2);
-		}
-		form.setValue('expiryDate', value);
-	};
-
-	const handleCVVInput = (e: React.ChangeEvent<HTMLInputElement>) => {
-		const value = e.target.value.replace(/\D/g, '').slice(0, 4);
-		form.setValue('cvv', value);
-	};
-
 	return (
 		<div className='px-5'>
 			<Form {...form}>
 				<form className='grid grid-cols-2 gap-4'>
-					{/* Card Number */}
-					<FormField
-						control={form.control}
-						name='cardNumber'
-						render={({ field }) => (
-							<FormItem className='col-span-2'>
-								<FormControl>
-									<div className='relative'>
-										<Input
-											placeholder='Card number'
-											{...field}
-											onChange={handleCardNumberInput}
-											className='pl-10 h-12 rounded-xl border-gray-200'
-										/>
-										<svg
-											className='absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-orange-500'
-											fill='currentColor'
-											viewBox='0 0 20 20'
-										>
-											<path d='M4 4a2 2 0 00-2 2v8a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2H4zm0 2h12v2H4V6zm0 4h12v2H4v-2z' />
-										</svg>
-									</div>
-								</FormControl>
-								<FormMessage />
-							</FormItem>
-						)}
-					/>
+					<div className='col-span-2'>
+						<PaymentElement
+							options={{
+								layout: {
+									type: 'auto',
+									defaultCollapsed: false,
+									radios: false,
+									spacedAccordionItems: false,
+								},
+								paymentMethodOrder: ['card'],
+								wallets: {
+									applePay: 'never',
+									googlePay: 'never',
+								},
+								fields: {
+									billingDetails: {
+										address: 'auto',
+									},
+								},
+							}}
+						/>
+					</div>
 
-					<FormField
-						control={form.control}
-						name='expiryDate'
-						render={({ field }) => (
-							<FormItem>
-								<FormControl>
-									<Input
-										placeholder='Exp. date'
-										{...field}
-										onChange={handleExpiryInput}
-										maxLength={5}
-										className='h-12 rounded-xl border-gray-200'
-									/>
-								</FormControl>
-								<FormMessage />
-							</FormItem>
-						)}
-					/>
-
-					<FormField
-						control={form.control}
-						name='cvv'
-						render={({ field }) => (
-							<FormItem>
-								<FormControl>
-									<Input
-										placeholder='CVV'
-										{...field}
-										onChange={handleCVVInput}
-										maxLength={4}
-										type='password'
-										className='h-12 rounded-xl border-gray-200'
-									/>
-								</FormControl>
-								<FormMessage />
-							</FormItem>
-						)}
-					/>
-
-					{/* Name on Card */}
-					<FormField
-						control={form.control}
-						name='nameOnCard'
-						render={({ field }) => (
-							<FormItem className='col-span-2'>
-								<FormControl>
-									<Input
-										placeholder='Name on card'
-										{...field}
-										className='h-12 rounded-xl border-gray-200'
-									/>
-								</FormControl>
-								<FormMessage />
-							</FormItem>
-						)}
-					/>
-
-					<FormField
+					{/* <FormField
 						control={form.control}
 						name='useShipping'
 						render={({ field }) => (
@@ -301,9 +269,9 @@ const PaymentView = ({
 								<FormMessage />
 							</FormItem>
 						)}
-					/>
+					/> */}
 
-					<FormField
+					{/* <FormField
 						control={form.control}
 						name='lastName'
 						render={({ field }) => (
@@ -397,7 +365,7 @@ const PaymentView = ({
 								<FormMessage />
 							</FormItem>
 						)}
-					/>
+					/> */}
 				</form>
 			</Form>
 		</div>

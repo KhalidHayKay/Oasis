@@ -34,7 +34,7 @@ interface CategoryTagResponse {
 
 interface CheckoutResponse {
 	success: boolean;
-	checkoutSession: CheckoutSession;
+	session: CheckoutSession;
 }
 
 interface PaymentIntentResponse {
@@ -52,12 +52,12 @@ interface AddToCartRequest {
 }
 
 interface Address {
-	shipping_fname: string;
-	shipping_lname: string;
-	shipping_phone: string;
-	shipping_address: string;
-	shipping_country: string;
-	shipping_city: string;
+	fname: string;
+	lname: string;
+	phone: string;
+	address: string;
+	country: string;
+	city: string;
 }
 
 interface CheckoutRequest extends Address {

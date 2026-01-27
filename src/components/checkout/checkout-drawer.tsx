@@ -6,6 +6,7 @@ import { useCheckoutStore } from '@/store/useCheckoutStore';
 import OrderSummaryView from './order-summary-view';
 import ShippingAddressView from './shipping-address-view';
 import PaymentCardView from './payment-view';
+import StripeElement from '../stripe/stripe-element';
 
 export type CheckoutView =
 	| 'cart'
@@ -121,11 +122,13 @@ export function CheckoutDrawer({
 		payment: {
 			title: 'Payment',
 			render: () => (
-				<PaymentCardView
-					checkoutSession={session as CheckoutSession}
-					setFooterButton={setFooterButton}
-					next={handlePaid}
-				/>
+				<StripeElement>
+					<PaymentCardView
+						checkoutSession={session as CheckoutSession}
+						setFooterButton={setFooterButton}
+						next={handlePaid}
+					/>
+				</StripeElement>
 			),
 		},
 		success: {

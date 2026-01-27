@@ -8,12 +8,13 @@ interface CheckoutState {
 	payment: {
 		clientSecret: string;
 		reference: string;
+		status: 'pending' | 'succeeded' | 'failed';
 	} | null;
 	getCheckoutSession: () => Promise<void>;
 	checkout: () => Promise<void>;
-	addAddress: (address: Address) => Promise<void>;
+	addAddress: (address: Address, checkoutToken: string) => Promise<void>;
 	intendPayment: (checkoutToken: string) => Promise<void>;
-	makePayment: () => Promise<void>;
+	confirmPayment: () => Promise<void>;
 }
 
 export const useCheckoutStore = create<CheckoutState>()(
@@ -36,21 +37,21 @@ export const useCheckoutStore = create<CheckoutState>()(
 				try {
 					const result = await checkoutService.create();
 					console.log(result);
-					set({ session: result.checkoutSession });
+					set({ session: result.session });
 				} catch (error) {
 					throw error;
 				}
 			},
 
-			addAddress: async (address) => {
+			addAddress: async (address, checkoutToken) => {
 				const data = {
 					...address,
-					checkout_token: get().session?.publicToken as string,
+					checkout_token: checkoutToken,
 				};
 
 				try {
 					const result = await checkoutService.address(data);
-					set({ session: result.checkoutSession });
+					set({ session: result.session });
 				} catch (error) {
 					throw error;
 				}
@@ -60,14 +61,17 @@ export const useCheckoutStore = create<CheckoutState>()(
 				try {
 					const { checkoutSession, reference, clientSecret } =
 						await paymentService.intent(checkoutToken);
-					set({ session: checkoutSession, payment: { clientSecret, reference } });
+					set({
+						session: checkoutSession,
+						payment: { status: 'pending', clientSecret, reference },
+					});
 				} catch (error) {
 					throw error;
 				}
 			},
 
-			makePayment: async () => {
-				//
+			confirmPayment: async () => {
+				console.log('Confirming payment...');
 			},
 		}),
 		{

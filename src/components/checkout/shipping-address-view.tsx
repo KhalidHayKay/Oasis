@@ -66,19 +66,20 @@ const ShippingAddressView = ({
 	});
 
 	const setShippingAddress = useCheckoutStore((state) => state.addAddress);
+	const checkoutSession = useCheckoutStore((state) => state.session);
 
 	const onSubmit = useCallback(async (values: CheckoutFormValues) => {
 		const data: Address = {
-			shipping_fname: values.firstName,
-			shipping_lname: values.lastName,
-			shipping_phone: values.phone,
-			shipping_address: values.address,
-			shipping_country: values.country,
-			shipping_city: values.city,
+			fname: values.firstName,
+			lname: values.lastName,
+			phone: values.phone,
+			address: values.address,
+			country: values.country,
+			city: values.city,
 		};
 
 		try {
-			await setShippingAddress(data);
+			await setShippingAddress(data, checkoutSession?.publicToken as string);
 			next();
 		} catch (error) {
 			const message =
