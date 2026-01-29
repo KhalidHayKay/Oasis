@@ -25,7 +25,6 @@ import {
 	useElements,
 	useStripe,
 } from '@stripe/react-stripe-js';
-import { stripePromise } from '@/lib/utils/stripe';
 import { toast } from 'sonner';
 
 const paymentSchema = z
@@ -93,12 +92,16 @@ interface PaymentViewProps {
 	checkoutSession: CheckoutSession;
 	setFooterButton: FooterButtonSetterType;
 	next: () => void;
+	onSuccess: () => void;
+	onFailed: () => void;
 }
 
 const PaymentView = ({
 	checkoutSession,
 	setFooterButton,
 	next,
+	onSuccess,
+	onFailed,
 }: PaymentViewProps) => {
 	const form = useForm<PaymentFormValues>({
 		resolver: zodResolver(paymentSchema),
@@ -137,54 +140,61 @@ const PaymentView = ({
 
 			try {
 				// Build billing details
-				// const billingDetails = values.useShipping
-				// 	? {
-				// 			// Use shipping address from checkoutSession
-				// 			name: `${checkoutSession.shippingAddress.firstName} ${checkoutSession.shippingAddress.lastName}`,
-				// 			phone: checkoutSession.shippingAddress.phone,
-				// 			address: {
-				// 				line1: checkoutSession.shippingAddress.address,
-				// 				city: checkoutSession.shippingAddress.city,
-				// 				country: checkoutSession.shippingAddress.country,
-				// 				postal_code: '00000',
-				// 				state: 'N/A',
-				// 			},
-				// 		}
-				// 	: {
-				// 			// Use custom billing address
-				// 			name: `${values.firstName} ${values.lastName}`,
-				// 			phone: values.phone,
-				// 			address: {
-				// 				line1: values.address,
-				// 				city: values.city,
-				// 				country: values.country,
-				// 				postal_code: '00000',
-				// 				state: 'N/A',
-				// 			},
-				// 		};
-
+				{
+					/*const billingDetails = values.useShipping
+					? {
+							// Use shipping address from checkoutSession
+							name: `${checkoutSession.shippingAddress.firstName} ${checkoutSession.shippingAddress.lastName}`,
+							phone: checkoutSession.shippingAddress.phone,
+							address: {
+								line1: checkoutSession.shippingAddress.address,
+								city: checkoutSession.shippingAddress.city,
+								country: checkoutSession.shippingAddress.country,
+								postal_code: '00000',
+								state: 'N/A',
+							},
+						}
+					: {
+							// Use custom billing address
+							name: `${values.firstName} ${values.lastName}`,
+							phone: values.phone,
+							address: {
+								line1: values.address,
+								city: values.city,
+								country: values.country,
+								postal_code: '00000',
+								state: 'N/A',
+							},
+						};
+						*/
+				}
 				// console.log(billingDetails);
 
-				// Submit payment to Stripe
 				const { error, paymentIntent } = await stripe.confirmPayment({
 					elements,
 					confirmParams: {
 						return_url: `${window.location.origin}/checkout/success`,
 					},
-					redirect: 'if_required', // Handle success in the same page
+					redirect: 'if_required',
 				});
 
 				if (error) {
-					// Show error to user
 					console.error('Payment error:', error);
 					toast.error(error.message || 'Payment failed');
-				} else if (paymentIntent && paymentIntent.status === 'succeeded') {
-					// Payment successful
-					setInterval(async () => {
-						await confirmPayment();
-					}, 1000);
-					toast.success('Payment successful!');
+					return;
+				}
+
+				if (paymentIntent && paymentIntent.status === 'succeeded') {
 					next();
+
+					try {
+						await new Promise((resolve) => setTimeout(resolve, 1500));
+						await confirmPayment();
+						onSuccess();
+					} catch (orderError) {
+						console.error('Order creation error:', orderError);
+						onFailed();
+					}
 				}
 			} catch (error) {
 				console.error('Payment submission error:', error);
@@ -193,7 +203,15 @@ const PaymentView = ({
 				setIsProcessing(false);
 			}
 		},
-		[stripe, elements, checkoutSession, confirmPayment, next],
+		[
+			stripe,
+			elements,
+			checkoutSession,
+			confirmPayment,
+			next,
+			onSuccess,
+			onFailed,
+		],
 	);
 
 	useEffect(() => {

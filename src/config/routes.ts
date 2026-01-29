@@ -7,6 +7,7 @@ const routes = {
 			view: (slug: string) => `/categories/${slug}`,
 		},
 		blog: '/blog',
+		orders: '/orders',
 	},
 	api: {
 		auth: {
@@ -56,7 +57,10 @@ const routes = {
 			get: '/api/checkout',
 			make: '/api/checkout',
 			address: '/api/checkout/address',
-			'payment-intent': 'api/checkout/payment-intent',
+		},
+		payment: {
+			intent: 'api/payment/intent',
+			confirm: 'api/payment/confirm',
 		},
 		order: {
 			make: '/api/orders',

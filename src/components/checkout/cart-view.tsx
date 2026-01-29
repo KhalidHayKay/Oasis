@@ -84,30 +84,28 @@ const CartView = ({
 	}, 0);
 
 	return (
-		<div className='flex flex-col h-full'>
-			{/* Cart Items */}
-			<div className='flex-1 overflow-y-auto space-y-4 pb-5'>
-				{items.map((item) => {
-					return <CartProduct key={item.id} item={item} />;
-				})}
+		<div className='flex flex-col h-full bg-background'>
+			{/* Cart Items List */}
+			<div className='flex-1 overflow-y-auto space-y-6 pb-5 pr-2 scrollbar-hide'>
+				{items.map((item) => (
+					<CartProduct key={item.id} item={item} />
+				))}
 			</div>
 
-			{/* Subtotal and Clear Cart Section */}
+			{/* Footer: Subtotal and Clear Cart */}
 			{items.length > 0 && (
-				<div className='pt-4 pb-10 space-y-3'>
-					<div className='flex justify-between items-center'>
-						<span className='text-lg font-medium text-foreground'>Subtotal</span>
-						<span className='text-xl font-semibold text-brand-800'>
-							${subtotal.toFixed(2)}
-						</span>
+				<div className='pt-6 pb-10 border-t border-border bg-background mt-auto'>
+					<div className='flex justify-between items-baseline mb-6'>
+						<span className='text-grey-500 font-medium tracking-tight'>Subtotal</span>
+						<div className='text-right'>
+							<span className='text-2xl font-bold text-brand-800 block'>
+								${subtotal.toFixed(2)}
+							</span>
+							<span className='text-[10px] text-grey-400 uppercase tracking-widest font-semibold'>
+								Shipping & taxes calculated at checkout
+							</span>
+						</div>
 					</div>
-					<Button
-						variant='outline'
-						onClick={clearCart}
-						className='w-full py-2 text-sm font-medium text-destructive hover:text-destructive/80 transition-colors'
-					>
-						Clear Cart
-					</Button>
 				</div>
 			)}
 		</div>

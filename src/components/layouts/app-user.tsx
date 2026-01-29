@@ -12,6 +12,7 @@ import { Button } from '@/components/ui/button';
 import { AuthDrawer } from '@/components/auth/auth-drawer';
 import { useAuthStore } from '@/store/useAuthStore';
 import { toast } from 'sonner';
+import Link from 'next/link';
 
 type AuthView =
 	| 'login'
@@ -119,16 +120,16 @@ export default function AppUser({
 							<>
 								<DropdownMenuSeparator />
 								<DropdownMenuItem className='cursor-pointer'>
-									<User className='mr-2 h-4 w-4' />
-									<span>My Account</span>
+									<Link href='/orders' className='flex items-center gap-4'>
+										<Package className='size-4' />
+										<span>My Orders</span>
+									</Link>
 								</DropdownMenuItem>
 								<DropdownMenuItem className='cursor-pointer'>
-									<Package className='mr-2 h-4 w-4' />
-									<span>My Orders</span>
-								</DropdownMenuItem>
-								<DropdownMenuItem className='cursor-pointer'>
-									<Settings className='mr-2 h-4 w-4' />
-									<span>Settings</span>
+									<Link href='/account' className='flex items-center gap-4'>
+										<User className='size-4' />
+										<span>My Account</span>
+									</Link>
 								</DropdownMenuItem>
 							</>
 						)}

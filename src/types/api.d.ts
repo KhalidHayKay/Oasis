@@ -43,6 +43,11 @@ interface PaymentIntentResponse {
 	reference: string;
 }
 
+interface PaymentConfirmResponse {
+	status: 'succeeded' | 'failed';
+	orderId: string;
+}
+
 // Requests
 
 interface AddToCartRequest {

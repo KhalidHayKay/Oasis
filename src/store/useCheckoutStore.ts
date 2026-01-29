@@ -71,7 +71,34 @@ export const useCheckoutStore = create<CheckoutState>()(
 			},
 
 			confirmPayment: async () => {
-				console.log('Confirming payment...');
+				const payment = get().payment;
+				if (!payment) {
+					throw new Error('No payment intent found');
+				}
+
+				const maxAttempts = 10;
+				const initialDelay = 500;
+
+				for (let attempt = 0; attempt < maxAttempts; attempt++) {
+					try {
+						const result = await paymentService.confirm(payment.reference);
+						set({
+							payment: {
+								...payment,
+								status: result.status,
+							},
+						});
+						return;
+					} catch (error) {
+						if (attempt === maxAttempts - 1) {
+							throw error; // Final attempt failed
+						}
+
+						// Wait before next attempt (exponential backoff)
+						const delayMs = initialDelay * Math.pow(1.5, attempt);
+						await new Promise((resolve) => setTimeout(resolve, delayMs));
+					}
+				}
 			},
 		}),
 		{

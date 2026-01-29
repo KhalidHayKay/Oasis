@@ -7,6 +7,7 @@ import OrderSummaryView from './order-summary-view';
 import ShippingAddressView from './shipping-address-view';
 import PaymentCardView from './payment-view';
 import StripeElement from '../stripe/stripe-element';
+import { SuccessView, ProcessingView, FailureView } from './order-status-view';
 
 export type CheckoutView =
 	| 'cart'
@@ -14,7 +15,9 @@ export type CheckoutView =
 	| 'address'
 	| 'summary'
 	| 'payment'
-	| 'success';
+	| 'processing'
+	| 'success'
+	| 'failure';
 
 interface CheckoutDrawerProps {
 	open: boolean;
@@ -61,14 +64,9 @@ export function CheckoutDrawer({
 	const handleAddressNext = useCallback(() => setCurrentView('address'), []);
 	const handleSummaryNext = useCallback(() => setCurrentView('summary'), []);
 	const handlePaymentNext = useCallback(() => setCurrentView('payment'), []);
-	const handlePaid = useCallback(() => setCurrentView('success'), []);
-
-	// const canGoBack = currentView === 'checkout' || currentView === 'payment';
-
-	// const handleBack = () => {
-	// 	if (currentView === 'payment') setCurrentView('checkout');
-	// 	else if (currentView === 'checkout') setCurrentView('cart');
-	// };
+	const handlePaid = useCallback(() => setCurrentView('processing'), []);
+	const handleSuccess = useCallback(() => setCurrentView('success'), []);
+	const handleFailure = useCallback(() => setCurrentView('failure'), []);
 
 	useEffect(() => {
 		if (session?.currentStep) {
@@ -127,13 +125,25 @@ export function CheckoutDrawer({
 						checkoutSession={session as CheckoutSession}
 						setFooterButton={setFooterButton}
 						next={handlePaid}
+						onSuccess={handleSuccess}
+						onFailed={handleFailure}
 					/>
 				</StripeElement>
 			),
 		},
+		processing: {
+			title: '',
+			render: () => <ProcessingView />,
+		},
 		success: {
 			title: '',
-			render: () => null, // <SuccessView />
+			render: () => <SuccessView onDone={handleClose} />,
+		},
+		failure: {
+			title: '',
+			render: () => (
+				<FailureView contactSupport={() => console.log('Contact support')} />
+			),
 		},
 	};
 
@@ -155,6 +165,3 @@ export function CheckoutDrawer({
 		</AppDrawer>
 	);
 }
-
-//   showBackButton={canGoBack}
-//   onBack={handleBack}
