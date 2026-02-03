@@ -7,6 +7,11 @@ export const authService = {
 		return res.data;
 	},
 
+	async refreshToken() {
+		const res: AuthResponse = await http.post(routes.api.auth.refresh);
+		return res;
+	},
+
 	async login(credentials: LoginCredentials) {
 		const res: AuthResponse = await http.post(routes.api.auth.login, credentials);
 		return res;
@@ -25,7 +30,7 @@ export const authService = {
 	async sendVerificationCode(email: string) {
 		const res: { message: string } = await http.post(
 			routes.api.auth.email.sendCode,
-			{ email }
+			{ email },
 		);
 		return res;
 	},

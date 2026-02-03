@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { authService } from '@/services/authService';
-import { authEvent } from '@/lib/events/authEvent';
+import { appEvent } from '@/lib/events/appEvent';
+import { stopTokenRefresh } from '@/lib/auth/token-refresh';
 
 interface AuthState {
 	// State
@@ -31,11 +32,12 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 		try {
 			const user = await authService.getUser();
 
-			authEvent.emit('initialized', user);
+			appEvent.emit('initialized', user);
 
 			set({ user, isAuthenticated: true, isInitiatingAuth: false });
-		} catch {
+		} catch (error) {
 			set({ isAuthenticated: false, isInitiatingAuth: false });
+			appEvent.emit('sessionExpired', null);
 		}
 	},
 
@@ -47,7 +49,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 				isAuthenticated: true,
 			});
 
-			authEvent.emit('login', response.user);
+			appEvent.emit('login', response.user);
 
 			return response;
 		} catch (error) {
@@ -77,7 +79,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 				isAuthenticated: true,
 			});
 
-			authEvent.emit('login', response.user);
+			appEvent.emit('login', response.user);
 
 			return response;
 		} catch (error) {
@@ -110,7 +112,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 		try {
 			const response = await authService.logout();
 
-			authEvent.emit('logout', get().user);
+			appEvent.emit('logout', get().user);
 
 			return response.message;
 		} catch (error) {

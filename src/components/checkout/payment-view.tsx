@@ -26,6 +26,9 @@ import {
 	useStripe,
 } from '@stripe/react-stripe-js';
 import { toast } from 'sonner';
+import { appEvent } from '@/lib/events/appEvent';
+import { authService } from '@/services/authService';
+import { useAuthStore } from '@/store/useAuthStore';
 
 const paymentSchema = z
 	.object({
@@ -93,7 +96,10 @@ interface PaymentViewProps {
 	setFooterButton: FooterButtonSetterType;
 	next: () => void;
 	onSuccess: () => void;
-	onFailed: () => void;
+	onFailed: (
+		errorMessage: string | undefined,
+		shouldContactSupport: boolean,
+	) => void;
 }
 
 const PaymentView = ({
@@ -188,30 +194,34 @@ const PaymentView = ({
 					next();
 
 					try {
-						await new Promise((resolve) => setTimeout(resolve, 1500));
-						await confirmPayment();
-						onSuccess();
+						// Wait for backend to confirm and create order
+						const result = await confirmPayment();
+
+						if (result.success) {
+							onSuccess();
+						} else {
+							// Payment went through but order creation failed
+							console.error('Order creation error:', result.error);
+							onFailed(result.error, result.shouldContactSupport || false);
+						}
 					} catch (orderError) {
 						console.error('Order creation error:', orderError);
-						onFailed();
+						toast.error(
+							orderError instanceof Error
+								? orderError.message
+								: 'Order creation failed',
+						);
 					}
 				}
 			} catch (error) {
 				console.error('Payment submission error:', error);
 				toast.error('An error occurred during payment');
 			} finally {
+				appEvent.emit('checkoutCompleted', null);
 				setIsProcessing(false);
 			}
 		},
-		[
-			stripe,
-			elements,
-			checkoutSession,
-			confirmPayment,
-			next,
-			onSuccess,
-			onFailed,
-		],
+		[elements, checkoutSession, confirmPayment, next, onSuccess, onFailed],
 	);
 
 	useEffect(() => {

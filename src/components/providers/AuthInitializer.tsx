@@ -3,11 +3,11 @@
 import { useEffect } from 'react';
 import { setLogout } from '@/lib/api/auth';
 import { useAuthStore } from '@/store/useAuthStore';
-import { mountAuthEventHandlers } from '@/lib/events/authEventHandler';
+import { mountAppEventHandlers } from '@/lib/events/appEventHandler';
 
 let isSetup = false;
 if (!isSetup) {
-	mountAuthEventHandlers();
+	mountAppEventHandlers();
 	isSetup = true;
 }
 

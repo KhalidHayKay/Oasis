@@ -38,14 +38,15 @@ interface CheckoutResponse {
 }
 
 interface PaymentIntentResponse {
-	checkoutSession: CheckoutSession;
 	clientSecret: string;
 	reference: string;
 }
 
 interface PaymentConfirmResponse {
-	status: 'succeeded' | 'failed';
+	status: 'pending' | 'successful' | 'failed' | 'cancelled';
 	orderId: string;
+	error: string | null;
+	error;
 }
 
 // Requests

@@ -8,14 +8,13 @@ interface ShippingAddress {
 }
 
 interface CheckoutSession {
-	id: number;
+	id: string;
 	publicToken: string;
 	customerEmail: string;
 	userId: number;
 	cartId: number;
 	shippingAddress: ShippingAddress;
 	billingAddress: ShippingAddress;
-	stripePaymentIntentId: string | null;
 	subtotal: number;
 	tax: number;
 	shippingFee: number;

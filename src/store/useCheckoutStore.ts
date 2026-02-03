@@ -8,13 +8,19 @@ interface CheckoutState {
 	payment: {
 		clientSecret: string;
 		reference: string;
-		status: 'pending' | 'succeeded' | 'failed';
+		status: 'pending' | 'successful' | 'failed' | 'cancelled';
 	} | null;
 	getCheckoutSession: () => Promise<void>;
+	getPaymentIntent: (checkoutSessionId: string) => Promise<void>;
 	checkout: () => Promise<void>;
 	addAddress: (address: Address, checkoutToken: string) => Promise<void>;
 	intendPayment: (checkoutToken: string) => Promise<void>;
-	confirmPayment: () => Promise<void>;
+	confirmPayment: () => Promise<{
+		success: boolean;
+		orderId?: string;
+		error?: string;
+		shouldContactSupport?: boolean;
+	}>;
 }
 
 export const useCheckoutStore = create<CheckoutState>()(
@@ -27,9 +33,28 @@ export const useCheckoutStore = create<CheckoutState>()(
 				try {
 					const result = await checkoutService.get();
 					set({ session: result });
+
+					get().getPaymentIntent(result.id);
 				} catch (error) {
 					set({ session: null });
 					throw error;
+				}
+			},
+
+			getPaymentIntent: async (checkoutSessionId) => {
+				try {
+					const result = await paymentService.getIntent(checkoutSessionId);
+					set({
+						payment: {
+							clientSecret: result.clientSecret,
+							reference: result.reference,
+							status: 'pending',
+						},
+					});
+				} catch (error) {
+					set({ payment: null });
+					console.error('Failed to fetch payment intent:', error);
+					return;
 				}
 			},
 
@@ -59,11 +84,10 @@ export const useCheckoutStore = create<CheckoutState>()(
 
 			intendPayment: async (checkoutToken) => {
 				try {
-					const { checkoutSession, reference, clientSecret } =
+					const { reference, clientSecret } =
 						await paymentService.intent(checkoutToken);
 					set({
-						session: checkoutSession,
-						payment: { status: 'pending', clientSecret, reference },
+						payment: { clientSecret, reference, status: 'pending' },
 					});
 				} catch (error) {
 					throw error;
@@ -78,27 +102,65 @@ export const useCheckoutStore = create<CheckoutState>()(
 
 				const maxAttempts = 10;
 				const initialDelay = 500;
+				const maxDelay = 5000;
 
 				for (let attempt = 0; attempt < maxAttempts; attempt++) {
 					try {
 						const result = await paymentService.confirm(payment.reference);
+
 						set({
 							payment: {
 								...payment,
 								status: result.status,
 							},
 						});
-						return;
-					} catch (error) {
-						if (attempt === maxAttempts - 1) {
-							throw error; // Final attempt failed
+
+						if (result.status === 'successful' && result.orderId) {
+							// Order successfully created
+							return { success: true, orderId: result.orderId };
 						}
 
-						// Wait before next attempt (exponential backoff)
-						const delayMs = initialDelay * Math.pow(1.5, attempt);
+						if (result.status === 'failed') {
+							// Payment failed
+							return {
+								success: false,
+								error: result.error || 'Payment failed',
+								shouldContactSupport: true,
+							};
+						}
+
+						if (attempt === maxAttempts - 1) {
+							// Max attempts reached but still processing
+							return {
+								success: false,
+								error:
+									'Order creation is taking longer than expected. Please check your email for confirmation or contact support.',
+								shouldContactSupport: true,
+							};
+						}
+
+						const delayMs = Math.min(initialDelay * Math.pow(1.5, attempt), maxDelay);
 						await new Promise((resolve) => setTimeout(resolve, delayMs));
+					} catch (error) {
+						// if (attempt === maxAttempts - 1) {
+						return {
+							success: false,
+							error: 'Unable to verify payment status. Please contact support.',
+							shouldContactSupport: true,
+						};
+						// }
+
+						// Exponential backoff
+						// const delayMs = Math.min(initialDelay * Math.pow(1.5, attempt), maxDelay);
+						// await new Promise((resolve) => setTimeout(resolve, delayMs));
 					}
 				}
+
+				return {
+					success: false,
+					error: 'Payment confirmation timed out',
+					shouldContactSupport: true,
+				};
 			},
 		}),
 		{

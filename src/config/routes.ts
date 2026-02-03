@@ -1,3 +1,5 @@
+import { refresh } from 'next/cache';
+
 const routes = {
 	page: {
 		home: '/',
@@ -12,6 +14,7 @@ const routes = {
 	api: {
 		auth: {
 			me: '/api/auth/me',
+			refresh: '/api/auth/refresh',
 			register: '/api/auth/register',
 			login: '/api/auth/login',
 			socialLogin: '/api/auth/social-login',
@@ -59,6 +62,7 @@ const routes = {
 			address: '/api/checkout/address',
 		},
 		payment: {
+			getIntent: '/api/payment/show',
 			intent: 'api/payment/intent',
 			confirm: 'api/payment/confirm',
 		},

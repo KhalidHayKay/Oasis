@@ -50,9 +50,11 @@ export const SuccessView = ({ onDone }: { onDone: () => void }) => {
 };
 
 export const FailureView = ({
-	contactSupport,
+	errorMessage,
+	contactSupport = null,
 }: {
-	contactSupport: () => void;
+	errorMessage?: string;
+	contactSupport: (() => void) | null;
 }) => {
 	return (
 		<div className='flex flex-col items-center justify-center gap-y-3 text-foreground text-center'>
@@ -64,15 +66,24 @@ export const FailureView = ({
 			<h2 className='text-2xl font-semibold text-center mb-4'>
 				Order Creation Failed
 			</h2>
-			<div className='text-sm sm:text-base'>
-				<p className=''>
-					Your payment was successful, but we couldn't create your order.
+			<div className='text-sm sm:text-base space-y-2'>
+				<p>
+					Your payment was processed, but we encountered an issue creating your
+					order.
 				</p>
-				<p>Please contact our support team with your payment confirmation.</p>
+				{errorMessage && <p>{errorMessage}</p>}
 			</div>
-			<AppButton className='w-full mt-10' onClick={contactSupport}>
-				Contact Support
-			</AppButton>
+			{contactSupport && (
+				<>
+					<p className='font-medium'>
+						Please contact our support team with your payment confirmation. We'll
+						resolve this quickly.
+					</p>
+					<AppButton className='w-full mt-10' onClick={contactSupport}>
+						Contact Support
+					</AppButton>
+				</>
+			)}
 		</div>
 	);
 };
