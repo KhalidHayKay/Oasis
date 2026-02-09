@@ -104,7 +104,7 @@ const ShippingAddressView = ({
 	}, [setFooterButton, form, onSubmit]);
 
 	return (
-		<div className='space-y-6'>
+		<div className='space-y-6 px-5 sm:px-15 lg:px-5'>
 			<div className='space-y-2'>
 				<h2 className='text-lg font-medium text-foreground'>
 					Customer Information

@@ -97,8 +97,9 @@ interface PaymentViewProps {
 	next: () => void;
 	onSuccess: () => void;
 	onFailed: (
-		errorMessage: string | undefined,
+		errorMessage: string,
 		shouldContactSupport: boolean,
+		paymentRef?: string | undefined,
 	) => void;
 }
 
@@ -196,13 +197,16 @@ const PaymentView = ({
 					try {
 						// Wait for backend to confirm and create order
 						const result = await confirmPayment();
-
 						if (result.success) {
 							onSuccess();
 						} else {
 							// Payment went through but order creation failed
 							console.error('Order creation error:', result.error);
-							onFailed(result.error, result.shouldContactSupport || false);
+							onFailed(
+								result.error ?? 'Order creation failed',
+								result.shouldContactSupport || false,
+								paymentIntent.id,
+							);
 						}
 					} catch (orderError) {
 						console.error('Order creation error:', orderError);

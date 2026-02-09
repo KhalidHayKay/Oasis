@@ -119,14 +119,14 @@ export default function AppUser({
 						{user?.emailVerified && (
 							<>
 								<DropdownMenuSeparator />
-								<DropdownMenuItem className='cursor-pointer'>
-									<Link href='/orders' className='flex items-center gap-4'>
+								<DropdownMenuItem className='cursor-pointer p-0'>
+									<Link href='/orders' className='w-full flex items-center gap-4 p-2'>
 										<Package className='size-4' />
 										<span>My Orders</span>
 									</Link>
 								</DropdownMenuItem>
-								<DropdownMenuItem className='cursor-pointer'>
-									<Link href='/account' className='flex items-center gap-4'>
+								<DropdownMenuItem className='cursor-pointer p-0'>
+									<Link href='/account' className='w-full flex items-center gap-4 p-2'>
 										<User className='size-4' />
 										<span>My Account</span>
 									</Link>

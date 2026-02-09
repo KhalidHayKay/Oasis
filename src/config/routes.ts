@@ -9,7 +9,10 @@ const routes = {
 			view: (slug: string) => `/categories/${slug}`,
 		},
 		blog: '/blog',
-		orders: '/orders',
+		orders: {
+			all: '/orders',
+			detail: (slug: string | number) => `/orders/${slug}`,
+		},
 	},
 	api: {
 		auth: {
@@ -67,8 +70,8 @@ const routes = {
 			confirm: 'api/payment/confirm',
 		},
 		order: {
-			make: '/api/orders',
-			payment: (orderId: string) => `/api/orders/${orderId}/payment`,
+			all: '/api/orders',
+			get: (id: string) => `api/orders/${id}`,
 		},
 	},
 };

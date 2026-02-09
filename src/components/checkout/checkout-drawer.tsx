@@ -53,11 +53,11 @@ export function CheckoutDrawer({
 	const [currentView, setCurrentView] = useState<CheckoutView>('cart');
 	const [footerButton, setFooterButton] = useState<FooterButton | null>(null);
 
-	const [paymentErrorMessage, setPaymentErrorMessage] = useState<
-		string | undefined
-	>();
-	const [shouldContactSupport, setShouldContactSupport] =
-		useState<boolean>(false);
+	const [paymentErrorDetails, setPaymentErrorDetails] = useState<{
+		errorMessage: string;
+		shouldContactSupport: boolean;
+		paymenmtReference?: string;
+	}>({ errorMessage: '', shouldContactSupport: false });
 
 	const items = useCartStore((state) => state.items);
 	const session = useCheckoutStore((state) => state.session);
@@ -72,10 +72,21 @@ export function CheckoutDrawer({
 	const handlePaymentNext = useCallback(() => setCurrentView('payment'), []);
 	const handlePaid = useCallback(() => setCurrentView('processing'), []);
 	const handleSuccess = useCallback(() => setCurrentView('success'), []);
-	const handleFailure = useCallback((errorMessage: string | undefined) => {
-		setCurrentView('failure');
-		setPaymentErrorMessage(errorMessage);
-	}, []);
+	const handleFailure = useCallback(
+		(
+			errorMessage: string,
+			shouldContactSupport: boolean,
+			paymentRef?: string,
+		) => {
+			setPaymentErrorDetails({
+				errorMessage,
+				shouldContactSupport,
+				paymenmtReference: paymentRef,
+			});
+			setCurrentView('failure');
+		},
+		[],
+	);
 
 	useEffect(() => {
 		if (session?.currentStep) {
@@ -159,10 +170,13 @@ export function CheckoutDrawer({
 			title: '',
 			render: () => (
 				<FailureView
-					errorMessage={paymentErrorMessage}
-					contactSupport={
-						shouldContactSupport ? () => console.log('Contact support') : null
+					errorMessage={paymentErrorDetails.errorMessage}
+					onContactSupport={
+						paymentErrorDetails.shouldContactSupport
+							? () => console.log('Contact support')
+							: undefined
 					}
+					paymentReference={paymentErrorDetails.paymenmtReference}
 				/>
 			),
 		},

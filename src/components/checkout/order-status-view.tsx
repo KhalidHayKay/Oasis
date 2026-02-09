@@ -1,5 +1,7 @@
 import Image from 'next/image';
 import AppButton from '../app-button';
+import { Button } from '../ui/button';
+import { useState } from 'react';
 
 export const ProcessingView = () => {
 	return (
@@ -50,40 +52,80 @@ export const SuccessView = ({ onDone }: { onDone: () => void }) => {
 };
 
 export const FailureView = ({
+	onContactSupport,
 	errorMessage,
-	contactSupport = null,
+	paymentReference,
 }: {
 	errorMessage?: string;
-	contactSupport: (() => void) | null;
+	onContactSupport?: () => void;
+	paymentReference?: string;
 }) => {
+	const [copied, setCopied] = useState(false);
+	const shouldContactSupport = !!onContactSupport;
+
+	const handleCopy = () => {
+		if (!paymentReference) return;
+
+		navigator.clipboard.writeText(paymentReference);
+		setCopied(true);
+		setTimeout(() => setCopied(false), 2000);
+	};
+
 	return (
-		<div className='flex flex-col items-center justify-center gap-y-3 text-foreground text-center'>
-			<div className='w-[200px] h-[200px] mx-auto mb-5 flex items-center justify-center'>
-				<div className='w-16 h-16 rounded-full bg-destructive/10 flex items-center justify-center'>
-					<span className='text-destructive text-3xl'>✕</span>
-				</div>
+		<div className='flex flex-col items-center justify-center gap-y-4 text-foreground text-center p-4'>
+			{/* Visual Indicator */}
+			<div className='w-16 h-16 rounded-full flex items-center justify-center bg-destructive/10 mb-2'>
+				<span className='text-destructive text-3xl font-bold'>
+					{shouldContactSupport ? '!' : '✕'}
+				</span>
 			</div>
-			<h2 className='text-2xl font-semibold text-center mb-4'>
-				Order Creation Failed
+
+			<h2 className='text-2xl font-bold'>
+				{shouldContactSupport ? 'Action Required' : 'Transaction Failed'}
 			</h2>
-			<div className='text-sm sm:text-base space-y-2'>
-				<p>
-					Your payment was processed, but we encountered an issue creating your
-					order.
+
+			<div className='space-y-3'>
+				<p className='text-sm sm:text-base font-medium'>
+					Your payment went through, but we couldn't create your order automatically.
 				</p>
-				{errorMessage && <p>{errorMessage}</p>}
-			</div>
-			{contactSupport && (
-				<>
-					<p className='font-medium'>
-						Please contact our support team with your payment confirmation. We'll
-						resolve this quickly.
+
+				{/* Reference Box - High Visibility */}
+				<div className='bg-muted p-4 rounded-xl border border-border shadow-sm'>
+					<p className='text-[10px] uppercase tracking-widest text-muted-foreground font-bold mb-2'>
+						Required Reference
 					</p>
-					<AppButton className='w-full mt-10' onClick={contactSupport}>
-						Contact Support
+					<div className='flex items-center gap-3 justify-center'>
+						<code className='bg-background px-3 py-1.5 rounded border font-mono text-sm font-semibold'>
+							{paymentReference}
+						</code>
+						<button
+							onClick={handleCopy}
+							className='text-xs font-bold text-primary hover:opacity-80 transition-opacity uppercase'
+						>
+							{copied ? 'Copied' : 'Copy'}
+						</button>
+					</div>
+				</div>
+
+				<p className='text-xs text-muted-foreground'>Error: {errorMessage}</p>
+			</div>
+
+			{/* Action Buttons */}
+			<div className='w-full mt-4 flex flex-col gap-2'>
+				{shouldContactSupport && (
+					<AppButton className='w-full rounded-lg' onClick={onContactSupport}>
+						Contact Support Now
 					</AppButton>
-				</>
-			)}
+				)}
+
+				<Button
+					variant='outline'
+					className='w-full'
+					onClick={() => (window.location.href = '/')}
+				>
+					{shouldContactSupport ? 'Return to Home' : 'Try Again'}
+				</Button>
+			</div>
 		</div>
 	);
 };

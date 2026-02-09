@@ -17,9 +17,9 @@ interface CheckoutState {
 	intendPayment: (checkoutToken: string) => Promise<void>;
 	confirmPayment: () => Promise<{
 		success: boolean;
-		orderId?: string;
 		error?: string;
 		shouldContactSupport?: boolean;
+		orderId?: string;
 	}>;
 }
 
