@@ -88,7 +88,7 @@ const ShippingAddressView = ({
 					: 'An error occured while trying to add address';
 			toast.error(message);
 		}
-	}, []);
+	}, [checkoutSession, setShippingAddress, next]);
 
 	useEffect(() => {
 		const handleFormSubmit = () => {

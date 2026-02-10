@@ -7,7 +7,6 @@ import './globals.css';
 import routes from '@/config/routes';
 import AuthInitializer from '@/components/providers/AuthInitializer';
 import { Toaster } from '@/components/ui/sonner';
-import Script from 'next/script';
 
 const _geist = Geist({ subsets: ['latin'] });
 const _geistMono = Geist_Mono({ subsets: ['latin'] });

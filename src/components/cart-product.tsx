@@ -1,5 +1,5 @@
 import { useCartStore } from '@/store/useCartStore';
-import { Trash, X } from 'lucide-react';
+import { Trash } from 'lucide-react';
 import Image from 'next/image';
 
 const CartProduct = ({ item }: { item: CartItem }) => {

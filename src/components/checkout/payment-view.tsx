@@ -7,19 +7,14 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import {
 	Form,
-	FormControl,
-	FormField,
-	FormItem,
-	FormMessage,
+	// FormControl,
+	// FormField,
+	// FormItem,
+	// FormMessage,
 } from '@/components/ui/form';
-import { Input } from '@/components/ui/input';
-import { Checkbox } from '@/components/ui/checkbox';
 import { useCheckoutStore } from '@/store/useCheckoutStore';
 import { useEffect, useCallback } from 'react';
 import type { FooterButtonSetterType } from './checkout-drawer';
-import { cn } from '@/lib/utils';
-import { useWatch } from 'react-hook-form';
-import StripeElement from '../stripe/stripe-element';
 import {
 	PaymentElement,
 	useElements,
@@ -27,8 +22,6 @@ import {
 } from '@stripe/react-stripe-js';
 import { toast } from 'sonner';
 import { appEvent } from '@/lib/events/appEvent';
-import { authService } from '@/services/authService';
-import { useAuthStore } from '@/store/useAuthStore';
 
 const paymentSchema = z
 	.object({
@@ -131,13 +124,13 @@ const PaymentView = ({
 
 	const confirmPayment = useCheckoutStore((state) => state.confirmPayment);
 
-	const useShippingValue = useWatch({
-		control: form.control,
-		name: 'useShipping',
-	});
+	console.log('Processing payment: ', isProcessing);
 
 	const onSubmit = useCallback(
 		async (values: PaymentFormValues) => {
+			console.log('Billing address:', values);
+			console.log('Shipping address:', checkoutSession.shippingAddress);
+
 			if (!stripe || !elements) {
 				console.error('Stripe not loaded');
 				return;
@@ -225,7 +218,15 @@ const PaymentView = ({
 				setIsProcessing(false);
 			}
 		},
-		[elements, checkoutSession, confirmPayment, next, onSuccess, onFailed],
+		[
+			stripe,
+			elements,
+			confirmPayment,
+			checkoutSession.shippingAddress,
+			next,
+			onSuccess,
+			onFailed,
+		],
 	);
 
 	useEffect(() => {

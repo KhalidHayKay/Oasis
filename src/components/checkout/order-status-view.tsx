@@ -86,7 +86,8 @@ export const FailureView = ({
 
 			<div className='space-y-3'>
 				<p className='text-sm sm:text-base font-medium'>
-					Your payment went through, but we couldn't create your order automatically.
+					Your payment went through, but we couldn&apos;t create your order
+					automatically.
 				</p>
 
 				{/* Reference Box - High Visibility */}

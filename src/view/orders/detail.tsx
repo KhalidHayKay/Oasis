@@ -3,6 +3,7 @@ import { FormatCurrency, FormatDate } from './format';
 import OrderTracker from './tracker';
 import Link from 'next/link';
 import routes from '@/config/routes';
+import Image from 'next/image';
 
 const OrderDetail = ({ order }: { order: Order }) => {
 	return (
@@ -53,9 +54,10 @@ const OrderDetail = ({ order }: { order: Order }) => {
 								<div key={item.id} className='p-6 flex gap-4 sm:gap-6'>
 									{/* Image Container matching your system */}
 									<div className='relative bg-muted rounded-lg overflow-hidden shrink-0 size-20 sm:size-24 flex items-center justify-center'>
-										<img
+										<Image
 											src={item.productImage.src}
 											alt={item.productName}
+											fill
 											className='size-full object-cover'
 										/>
 									</div>

@@ -89,17 +89,19 @@ export function CheckoutDrawer({
 	);
 
 	useEffect(() => {
-		if (session?.currentStep) {
-			setCurrentView(session.currentStep as CheckoutView);
+		if (session?.currentStep && session.currentStep !== currentView) {
+			Promise.resolve().then(() =>
+				setCurrentView(session.currentStep as CheckoutView),
+			);
 		}
-	}, [session?.currentStep]);
+	}, [session?.currentStep, currentView]);
 
 	// Reset drawer state when it closes
 	useEffect(() => {
-		if (!open) {
-			setFooterButton(null);
+		if (!open && footerButton !== null) {
+			Promise.resolve().then(() => setFooterButton(null));
 		}
-	}, [open]);
+	}, [open, footerButton]);
 
 	const viewContent: ViewContentType = {
 		cart: {

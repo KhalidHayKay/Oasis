@@ -16,6 +16,7 @@ import {
 	Moon,
 	Sun,
 } from 'lucide-react';
+import Image from 'next/image';
 
 // --- Types & Interfaces ---
 
@@ -222,9 +223,10 @@ const ProfileSection = ({ data }: { data: UserProfile }) => {
 				{/* Avatar Upload */}
 				<div className='flex items-center gap-6'>
 					<div className='relative group size-20 sm:size-24 shrink-0'>
-						<img
+						<Image
 							src={formData.avatarUrl}
 							alt='Profile'
+							fill
 							className='size-full rounded-full object-cover border-2 border-muted'
 						/>
 						<button

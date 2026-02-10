@@ -13,7 +13,6 @@ import Logo from '../logo';
 import { CheckoutDrawer } from '../checkout/checkout-drawer';
 import { useCartStore } from '@/store/useCartStore';
 import { toast } from 'sonner';
-import { useCheckoutStore } from '@/store/useCheckoutStore';
 
 type AuthView =
 	| 'login'

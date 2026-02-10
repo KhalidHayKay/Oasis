@@ -12,6 +12,7 @@ import {
 	ShoppingBag,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import Image from 'next/image';
 
 interface OrderSummaryViewProps {
 	checkoutSession: CheckoutSession;
@@ -90,7 +91,7 @@ const OrderSummaryView = ({
 			label: 'Continue to Payment',
 			action: handlePaymentIntent,
 		});
-	}, [setFooterButton, next, timeLeft]);
+	}, [intendPayment, checkoutSession, setFooterButton, next, timeLeft]);
 
 	const isExpired = timeLeft === 'Expired';
 
@@ -201,9 +202,10 @@ const OrderSummaryView = ({
 								{/* Product Image */}
 								<div className='relative bg-muted rounded-lg overflow-hidden size-16 shrink-0 border border-border group-hover:border-brand-300 transition-colors'>
 									{item.productImage ? (
-										<img
+										<Image
 											src={item.productImage.src}
 											alt={item.productImage.alt}
+											fill
 											className='size-full object-cover'
 										/>
 									) : (

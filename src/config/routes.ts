@@ -1,5 +1,3 @@
-import { refresh } from 'next/cache';
-
 const routes = {
 	page: {
 		home: '/',

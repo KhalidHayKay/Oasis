@@ -143,6 +143,7 @@ export const useCheckoutStore = create<CheckoutState>()(
 						await new Promise((resolve) => setTimeout(resolve, delayMs));
 					} catch (error) {
 						// if (attempt === maxAttempts - 1) {
+						console.error('Error confirming payment:', error);
 						return {
 							success: false,
 							error: 'Unable to verify payment status. Please contact support.',

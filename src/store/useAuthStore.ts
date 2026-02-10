@@ -1,7 +1,6 @@
 import { create } from 'zustand';
 import { authService } from '@/services/authService';
 import { appEvent } from '@/lib/events/appEvent';
-import { stopTokenRefresh } from '@/lib/auth/token-refresh';
 
 interface AuthState {
 	// State
@@ -38,6 +37,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 		} catch (error) {
 			set({ isAuthenticated: false, isInitiatingAuth: false });
 			appEvent.emit('sessionExpired', null);
+			console.error('Failed to initialize authentication:', error);
 		}
 	},
 

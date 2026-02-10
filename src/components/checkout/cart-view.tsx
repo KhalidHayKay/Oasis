@@ -1,9 +1,7 @@
 import Image from 'next/image';
 import CartProduct from '../cart-product';
-import { useCartStore } from '@/store/useCartStore';
-import { Button } from '../ui/button';
 import { FooterButtonSetterType } from './checkout-drawer';
-import { useEffect, useCallback } from 'react';
+import { useEffect } from 'react';
 import { useCheckoutStore } from '@/store/useCheckoutStore';
 import { toast } from 'sonner';
 import { useAuthStore } from '@/store/useAuthStore';
@@ -22,7 +20,6 @@ const CartView = ({
 	next,
 }: CartViewProps) => {
 	const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
-	const clearCart = useCartStore((state) => state.clearCart);
 	const checkout = useCheckoutStore((state) => state.checkout);
 
 	useEffect(() => {

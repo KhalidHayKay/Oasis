@@ -21,9 +21,4 @@ export const checkoutService = {
 		);
 		return response;
 	},
-
-	async makeOrder() {
-		const response = await http.post(routes.api.order.make);
-		return response;
-	},
 };

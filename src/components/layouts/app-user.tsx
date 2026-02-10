@@ -1,4 +1,4 @@
-import { User, Package, Settings, LogOut } from 'lucide-react';
+import { User, Package, LogOut } from 'lucide-react';
 import {
 	DropdownMenu,
 	DropdownMenuContent,

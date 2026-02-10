@@ -1,6 +1,5 @@
 import { cn } from '@/lib/utils';
 import { CheckCircle2, Clock, Package, Truck, XCircle } from 'lucide-react';
-import { de } from 'zod/v4/locales';
 
 const OrderTracker = ({ status }: { status: Order['status'] }) => {
 	if (status === 'cancelled') {
