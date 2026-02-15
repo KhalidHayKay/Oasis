@@ -137,7 +137,7 @@ export function LoginForm({
 				</form>
 			</Form>
 
-			<Social />
+			<Social onSuccess={onSuccess} />
 
 			<div className='text-center text-sm text-gray-600'>
 				First time here?{' '}

@@ -7,12 +7,24 @@ import {
 	DropdownMenuSeparator,
 	DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import {
+	AlertDialog,
+	AlertDialogAction,
+	AlertDialogCancel,
+	AlertDialogContent,
+	AlertDialogDescription,
+	AlertDialogFooter,
+	AlertDialogHeader,
+	AlertDialogTitle,
+	AlertDialogTrigger,
+} from '@/components/ui/alert-dialog';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { AuthDrawer } from '@/components/auth/auth-drawer';
 import { useAuthStore } from '@/store/useAuthStore';
 import { toast } from 'sonner';
 import Link from 'next/link';
+import Image from 'next/image';
 
 type AuthView =
 	| 'login'
@@ -54,9 +66,9 @@ export default function AppUser({
 	};
 
 	const handleLogout = async () => {
-		const isSure = window.confirm("Click OK if you're sure you want to logout");
+		// const isSure = window.confirm("Click OK if you're sure you want to logout");
 
-		if (!isSure) return;
+		// if (!isSure) return;
 
 		try {
 			const message = await logout();
@@ -75,10 +87,18 @@ export default function AppUser({
 					<DropdownMenuTrigger asChild>
 						<button className='relative rounded-full focus:outline-none focus:ring-2 focus:ring-grey-300 focus:ring-offset-2'>
 							<Avatar className='w-8 h-8 border border-grey-200 cursor-pointer hover:border-grey-400 transition-colors'>
-								<AvatarImage src={user?.avatar} alt={user?.name} />
-								<AvatarFallback className='bg-grey-100 text-grey-600 text-xs'>
-									{user?.name?.charAt(0).toUpperCase()}
-								</AvatarFallback>
+								{user?.avatar && user.avatar !== '' ? (
+									<Image
+										src={user.avatar}
+										alt={user?.name || 'User avatar'}
+										width={32}
+										height={32}
+									/>
+								) : (
+									<AvatarFallback className='bg-grey-100 text-grey-600 text-xs'>
+										{user?.name?.charAt(0).toUpperCase()}
+									</AvatarFallback>
+								)}
 							</Avatar>
 							{!user?.emailVerified && (
 								<span
@@ -135,12 +155,40 @@ export default function AppUser({
 						)}
 
 						<DropdownMenuSeparator />
-						<DropdownMenuItem
-							onClick={handleLogout}
-							className='cursor-pointer text-red-600 focus:text-red-600'
-						>
-							<LogOut className='mr-2 h-4 w-4' />
-							<span>Log Out</span>
+						<DropdownMenuItem>
+							<AlertDialog>
+								<AlertDialogTrigger asChild>
+									<Button
+										variant='ghost'
+										className='px-0! size-full justify-start cursor-pointer text-red-600 focus:text-red-600'
+										onClick={(e) => {
+											e.stopPropagation();
+										}}
+									>
+										<LogOut className='mr-2 h-4 w-4' />
+										<span>Log Out</span>
+									</Button>
+								</AlertDialogTrigger>
+								<AlertDialogContent>
+									<AlertDialogHeader>
+										<AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+										<AlertDialogDescription>
+											This will log you out of your account on this device. You can log
+											back in anytime.
+										</AlertDialogDescription>
+									</AlertDialogHeader>
+									<AlertDialogFooter>
+										<AlertDialogCancel>Cancel</AlertDialogCancel>
+										<AlertDialogAction
+											variant='destructive'
+											className='bg-brandRed/50'
+											onClick={handleLogout}
+										>
+											Logout
+										</AlertDialogAction>
+									</AlertDialogFooter>
+								</AlertDialogContent>
+							</AlertDialog>
 						</DropdownMenuItem>
 					</DropdownMenuContent>
 				</DropdownMenu>

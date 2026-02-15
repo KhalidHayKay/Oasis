@@ -1,5 +1,9 @@
 import axios from 'axios';
 
+interface ErrorWithDigest extends Error {
+	digest: string;
+}
+
 export const handleApiError = (error: unknown): never => {
 	if (axios.isAxiosError(error)) {
 		const status = error.response?.status;
@@ -41,8 +45,9 @@ export const handleApiError = (error: unknown): never => {
 			userMessage = 'Network error. Check your internet connection.';
 		}
 
-		const apiError = new Error(userMessage);
-		(apiError as any).digest = userMessage; // or a short code + message if you prefer
+		const apiError: ErrorWithDigest = Object.assign(new Error(userMessage), {
+			digest: userMessage,
+		});
 
 		throw apiError;
 	}

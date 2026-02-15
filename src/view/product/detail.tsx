@@ -16,13 +16,13 @@ const Detail = ({ product }: DetailProps) => {
 	const isLoading = useCartStore((state) => state.isLoading);
 	const isSyncing = useCartStore((state) => state.isSyncing);
 
-	console.log(isLoading, isSyncing);
+	// console.log(isLoading, isSyncing);
 
 	const { name, description, price, rating, colors } = product;
 
 	const cartItem = items.find(
 		(item) =>
-			item.productId === product.id && item.color === colors[selectedColor]
+			item.productId === product.id && item.color === colors[selectedColor],
 	);
 
 	const hasEntry = !!cartItem;

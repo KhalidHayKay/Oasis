@@ -18,7 +18,7 @@ const routes = {
 			refresh: '/api/auth/refresh',
 			register: '/api/auth/register',
 			login: '/api/auth/login',
-			socialLogin: '/api/auth/social-login',
+			socialLogin: (provider: string) => `/api/auth/provider/${provider}`,
 			logout: '/api/auth/logout',
 			logoutAll: '/api/auth/logout/all',
 			provider: (provider: string) => `/api/auth/provider/${provider}`,

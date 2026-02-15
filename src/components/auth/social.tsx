@@ -1,30 +1,31 @@
 import { Loader2 } from 'lucide-react';
 import { useState } from 'react';
 import { Button } from '../ui/button';
+import routes from '@/config/routes';
+import { useAuthStore } from '@/store/useAuthStore';
+import { toast } from 'sonner';
 
-const Social = () => {
-	const [isSocialLoading, setIsSocialLoading] = useState<string | null>(null);
+const Social = ({ onSuccess }: { onSuccess: () => void }) => {
+	const [isLoaging, setIsLoading] = useState(false);
+
+	const setOnSocialAuthSuccess = useAuthStore(
+		(state) => state.setOnSocialAuthSuccess,
+	);
 
 	const handleSocialLogin = async (provider: 'google' | 'apple') => {
-		console.log(provider);
-		setIsSocialLoading(provider);
-		// try {
-		// 	const response = await authService.openSocialAuth(provider);
-		// 	setUser(response.user);
-		// 	toast({
-		// 		title: 'Success',
-		// 		description: response.message,
-		// 	});
-		// 	onSuccess?.();
-		// } catch (error: any) {
-		// 	toast({
-		// 		title: 'Error',
-		// 		description: error.message || 'Social signup failed.',
-		// 		variant: 'destructive',
-		// 	});
-		// } finally {
-		// 	setIsSocialLoading(null);
-		// }
+		setOnSocialAuthSuccess(() => {
+			setIsLoading(false);
+			onSuccess();
+			toast.success('Login successful!');
+		});
+
+		setIsLoading(true);
+
+		window.open(
+			`${process.env.NEXT_PUBLIC_API_BASE}${routes.api.auth.socialLogin(provider)}`,
+			'socialAuth',
+			'width=500,height=600',
+		);
 	};
 
 	return (
@@ -43,49 +44,32 @@ const Social = () => {
 					type='button'
 					variant='outline'
 					onClick={() => handleSocialLogin('google')}
-					disabled={!!isSocialLoading}
+					disabled={isLoaging}
 					className='w-full h-12 rounded-full border-gray-300'
 				>
-					{isSocialLoading === 'google' ? (
+					{isLoaging ? (
 						<Loader2 className='mr-2 h-4 w-4 animate-spin' />
 					) : (
-						<svg className='mr-2 h-5 w-5' viewBox='0 0 24 24'>
+						<svg width='18' height='18' viewBox='0 0 48 48'>
 							<path
-								fill='currentColor'
-								d='M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z'
+								fill='#EA4335'
+								d='M24 9.5c3.54 0 6.7 1.22 9.19 3.6l6.86-6.86C35.95 2.45 30.41 0 24 0 14.82 0 6.73 5.48 2.69 13.44l8 6.21C12.66 13.29 17.87 9.5 24 9.5z'
 							/>
 							<path
-								fill='currentColor'
-								d='M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z'
+								fill='#4285F4'
+								d='M46.1 24.55c0-1.63-.15-3.19-.43-4.7H24v9h12.4c-.53 2.84-2.11 5.24-4.49 6.86l6.91 5.37C43.97 36.68 46.1 31.02 46.1 24.55z'
 							/>
 							<path
-								fill='currentColor'
-								d='M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z'
+								fill='#FBBC05'
+								d='M10.69 28.65a14.4 14.4 0 010-9.3l-8-6.21A23.98 23.98 0 000 24c0 3.86.92 7.51 2.69 10.86l8-6.21z'
 							/>
 							<path
-								fill='currentColor'
-								d='M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z'
+								fill='#34A853'
+								d='M24 48c6.41 0 11.95-2.12 15.93-5.77l-6.91-5.37c-1.92 1.29-4.38 2.05-9.02 2.05-6.13 0-11.34-3.79-13.31-9.15l-8 6.21C6.73 42.52 14.82 48 24 48z'
 							/>
 						</svg>
 					)}
 					Continue with Google
-				</Button>
-
-				<Button
-					type='button'
-					variant='outline'
-					onClick={() => handleSocialLogin('apple')}
-					disabled={!!isSocialLoading}
-					className='w-full h-12 rounded-full border-gray-300'
-				>
-					{isSocialLoading === 'apple' ? (
-						<Loader2 className='mr-2 h-4 w-4 animate-spin' />
-					) : (
-						<svg className='mr-2 h-5 w-5' viewBox='0 0 24 24' fill='currentColor'>
-							<path d='M17.05 20.28c-.98.95-2.05.8-3.08.35-1.09-.46-2.09-.48-3.24 0-1.44.62-2.2.44-3.06-.35C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13-.57 1.5-1.31 2.99-2.54 4.09l.01-.01zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z' />
-						</svg>
-					)}
-					Continue with Apple
 				</Button>
 			</div>
 		</>

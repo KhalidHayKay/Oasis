@@ -20,6 +20,23 @@ const AuthInitializer = ({ children }: { children: React.ReactNode }) => {
 		setLogout(logout);
 	}, [initializeAuth, logout]);
 
+	useEffect(() => {
+		const handleMessage = async (event: MessageEvent) => {
+			if (event.origin !== process.env.NEXT_PUBLIC_API_BASE) return;
+
+			if (event.data.success) {
+				useAuthStore.getState().onSocialAuthSuccess();
+				useAuthStore.getState().initializeAuth();
+			}
+		};
+
+		window.addEventListener('message', handleMessage);
+
+		return () => {
+			window.removeEventListener('message', handleMessage);
+		};
+	}, []);
+
 	return <>{children}</>;
 };
 

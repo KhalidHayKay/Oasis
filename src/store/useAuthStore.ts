@@ -13,17 +13,18 @@ interface AuthState {
 	register: (data: RegistrationData) => Promise<AuthResponse>;
 	verifyEmail: (data: VerifyEmailRequest) => Promise<AuthResponse>;
 	//   sendVerificationCode: (email: string) => Promise<AuthResponse>;
-	//   socialLogin: (provider: 'google' | 'apple') => Promise<AuthResponse>;
 	logout: () => Promise<string>;
 	initializeAuth: () => Promise<void>;
+	onSocialAuthSuccess: () => void;
+	setOnSocialAuthSuccess: (fn: () => void) => void;
 }
 
 export const useAuthStore = create<AuthState>((set, get) => ({
 	// Initial state
 	user: null,
 	isAuthenticated: false,
-	isInitiatingAuth: true,
-	message: null,
+	isInitiatingAuth: false,
+	onSocialAuthSuccess: () => {},
 
 	initializeAuth: async () => {
 		set({ isInitiatingAuth: true });
@@ -87,26 +88,6 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 		}
 	},
 
-	//   socialLogin: async (provider) => {
-	//     set({ isLoading: true, error: null });
-	//     try {
-	//       const response = await authService.openSocialAuth(provider);
-	//       set({
-	//         user: response.user,
-	//         token: response.token.access,
-	//         isAuthenticated: true,
-	//         isLoading: false,
-	//         error: null,
-	//       });
-	//     } catch (error) {
-	//       set({
-	//         isLoading: false,
-	//         error: error.message || 'Social login failed',
-	//       });
-	//       throw error;
-	//     }
-	//   },
-
 	logout: async () => {
 		set({ isInitiatingAuth: true });
 		try {
@@ -125,4 +106,6 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 			});
 		}
 	},
+
+	setOnSocialAuthSuccess: (fn) => set({ onSocialAuthSuccess: fn }),
 }));
