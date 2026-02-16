@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { ShoppingBag } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { cn } from '@/lib/utils';
 import { usePathname } from 'next/navigation';
 import AppUser from './app-user';
@@ -31,6 +31,10 @@ export function Header({
 	const [scrollDepth, setScrollDepth] = useState(0);
 	const [isCartOpen, setIsCartOpen] = useState(false);
 
+	// Mobile nav visibility
+	const [isMobileNavVisible, setIsMobileNavVisible] = useState(true);
+	const [lastScrollY, setLastScrollY] = useState(0);
+
 	// Auth drawer state
 	const [isAuthDrawerOpen, setIsAuthDrawerOpen] = useState(false);
 	const [authView, setAuthView] = useState<AuthView>('login');
@@ -43,9 +47,14 @@ export function Header({
 
 	const activeNav = navLinks.find((link) => pathname === link.href)?.label || '';
 
-	const handleWindowScroll = () => {
-		setScrollDepth(window.scrollY);
-	};
+	const handleWindowScroll = useCallback(() => {
+		const currentScrollY = window.scrollY;
+
+		// Only hide mobile nav when scrolling down on mobile
+		setIsMobileNavVisible(currentScrollY < lastScrollY || currentScrollY < 20);
+		setLastScrollY(currentScrollY);
+		setScrollDepth(currentScrollY);
+	}, [lastScrollY]);
 
 	useEffect(() => {
 		window.addEventListener('scroll', handleWindowScroll);
@@ -53,7 +62,7 @@ export function Header({
 		return () => {
 			window.removeEventListener('scroll', handleWindowScroll);
 		};
-	}, []);
+	}, [lastScrollY, handleWindowScroll]);
 
 	// Handles auth success - reopen checkout if user was trying to checkout
 	const handleAuthSuccess = () => {
@@ -149,8 +158,14 @@ export function Header({
 					</div>
 				</div>
 
-				{/* Mobile navigation */}
-				<nav className='md:hidden flex items-center gap-6 pb-3 border-t border-grey-100 pt-3'>
+				{/* Mobile navigation - hides on scroll down */}
+				<nav
+					className={cn(
+						'md:hidden flex items-center gap-6 pb-3 border-t border-grey-100 pt-3',
+						'transition-all duration-200 overflow-hidden',
+						isMobileNavVisible ? 'max-h-20 opacity-100' : 'max-h-0 opacity-0 py-0',
+					)}
+				>
 					{navLinks.map((link, i) => (
 						<Link
 							key={i}

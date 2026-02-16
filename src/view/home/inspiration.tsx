@@ -1,7 +1,7 @@
 'use client';
 
 import HorizontalScrollablePill from '@/components/horizontal-scrollable-pills';
-import InspoItem from '@/components/inspo-item';
+import InspoItem, { InspoItemSkeleton } from '@/components/inspo-item';
 import { Button } from '@/components/ui/button';
 import { useInspirations } from '@/hooks/useInspirations';
 import { useState } from 'react';
@@ -44,15 +44,17 @@ const Inspiration = ({ inspirations }: { inspirations: Inspiration[] }) => {
 			</div>
 
 			<div className='space-y-8'>
-				{/* Masonry Grid with equal bottom alignment */}
-				<div className='columns-2 sm:columns-3 gap-6'>
-					{displayedInspirations.map((item) => (
-						<div key={item.id} className='mb-6 break-inside-avoid'>
-							<InspoItem inspo={item} />
-						</div>
-					))}
-				</div>
-
+				{!displayedInspirations.length ? (
+					<InspoItemSkeleton />
+				) : (
+					<div className='columns-2 sm:columns-3 gap-6'>
+						{displayedInspirations.map((item) => (
+							<div key={item.id} className='mb-6 break-inside-avoid'>
+								<InspoItem inspo={item} />
+							</div>
+						))}
+					</div>
+				)}
 				{/* Show More Section */}
 				{filteredInspirations.length > 0 && (
 					<div className='flex flex-col items-center gap-6'>

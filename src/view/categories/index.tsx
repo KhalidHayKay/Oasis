@@ -1,6 +1,7 @@
 'use client';
 
 import CategoryCard from '@/components/category-card';
+import { ArrowUpRight } from 'lucide-react';
 import Link from 'next/link';
 
 const CategoriesView = ({ categories }: { categories: Category[] }) => {
@@ -21,7 +22,7 @@ const CategoriesView = ({ categories }: { categories: Category[] }) => {
 				</div>
 			</div>
 
-			<div className='py-10 sm:py-20'>
+			<div className='pt-10 sm:pt-20'>
 				<div className='text-center'>
 					<h2 className='text-2xl font-bold text-foreground mb-2'>
 						Can{"'"}t find what you{"'"}re looking for?
@@ -30,10 +31,12 @@ const CategoriesView = ({ categories }: { categories: Category[] }) => {
 						Browse our complete shop or contact our team for personalized
 						recommendations
 					</p>
-					<Link href='/shop'>
-						<button className='inline-flex items-center justify-center px-6 py-3 bg-primary text-primary-foreground font-medium rounded-lg hover:bg-primary/90 transition-colors'>
-							Browse All Products
-						</button>
+					<Link
+						href='/shop'
+						className='inline-flex items-center justify-center gap-x-3 px-6 py-3 bg-brand-800 text-primary-foreground font-medium rounded-sm hover:bg-brand-700 hover:scale-102 transition'
+					>
+						<span className='font-medium'>Browse All Products</span>
+						<ArrowUpRight className='size-5' />
 					</Link>
 				</div>
 			</div>

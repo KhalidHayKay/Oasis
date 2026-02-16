@@ -13,7 +13,7 @@ export function Footer({
 }) {
 	return (
 		<footer className='mt-20 bg-grey-900 text-slate-50'>
-			<div className='px-2 py-20 sm:px-6 lg:px-12'>
+			<div className='px-2 py-10 sm:py-20 sm:px-6 lg:px-12'>
 				<div className='grid gap-x-20 md:grid-cols-[auto_auto_auto_auto] items-end'>
 					<div className='flex flex-col gap-y-15 md:gap-y-30'>
 						<Logo secondary />
@@ -73,7 +73,7 @@ export function Footer({
 						</div>
 					</div>
 
-					<div className='flex flex-col gap-y-15 md:gap-y-35 items-end'>
+					<div className='flex flex-col gap-y-5 sm:gap-y-15 md:gap-y-35 items-end'>
 						<Button
 							variant='ghost'
 							onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}

@@ -28,8 +28,8 @@ const InspoItem = ({ inspo }: { inspo: Inspiration }) => {
 					/>
 				</div>
 
-				{/* Hover Overlay */}
-				<div className='absolute inset-0 bg-linear-to-t from-black/60 via-black/0 to-black/0 opacity-0 group-hover:opacity-100 transition-opacity duration-300'>
+				{/* Always visible on touch, hover-activated on pointer devices */}
+				<div className='absolute inset-0 bg-gradient-to-t from-black/60 via-black/0 to-black/0 transition-opacity duration-300 [@media(hover:hover)]:opacity-0 [@media(hover:hover)]:group-hover:opacity-100'>
 					<div className='absolute bottom-0 left-0 right-0 p-4 text-white'>
 						<p className='text-sm font-medium'>{inspo.category}</p>
 						{inspo.title && (
