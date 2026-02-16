@@ -15,8 +15,6 @@ interface AuthState {
 	//   sendVerificationCode: (email: string) => Promise<AuthResponse>;
 	logout: () => Promise<string>;
 	initializeAuth: () => Promise<void>;
-	onSocialAuthSuccess: () => void;
-	setOnSocialAuthSuccess: (fn: () => void) => void;
 }
 
 export const useAuthStore = create<AuthState>((set, get) => ({
@@ -24,7 +22,6 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 	user: null,
 	isAuthenticated: false,
 	isInitiatingAuth: false,
-	onSocialAuthSuccess: () => {},
 
 	initializeAuth: async () => {
 		set({ isInitiatingAuth: true });
@@ -106,6 +103,4 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 			});
 		}
 	},
-
-	setOnSocialAuthSuccess: (fn) => set({ onSocialAuthSuccess: fn }),
 }));

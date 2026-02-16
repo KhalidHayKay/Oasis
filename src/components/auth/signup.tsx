@@ -201,11 +201,7 @@ export function SignupForm({ onSuccess, onSwitchToLogin }: SignupFormProps) {
 				</form>
 			</Form>
 
-			<Social
-				onSuccess={() => {
-					onSuccess('');
-				}}
-			/>
+			<Social />
 
 			<div className='text-center text-sm text-gray-600'>
 				Already have an account?{' '}

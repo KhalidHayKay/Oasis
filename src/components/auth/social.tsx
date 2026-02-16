@@ -2,30 +2,22 @@ import { Loader2 } from 'lucide-react';
 import { useState } from 'react';
 import { Button } from '../ui/button';
 import routes from '@/config/routes';
-import { useAuthStore } from '@/store/useAuthStore';
-import { toast } from 'sonner';
 
-const Social = ({ onSuccess }: { onSuccess: () => void }) => {
+const Social = () => {
 	const [isLoaging, setIsLoading] = useState(false);
 
-	const setOnSocialAuthSuccess = useAuthStore(
-		(state) => state.setOnSocialAuthSuccess,
-	);
-
-	const handleSocialLogin = async (provider: 'google' | 'apple') => {
-		setOnSocialAuthSuccess(() => {
-			setIsLoading(false);
-			onSuccess();
-			toast.success('Login successful!');
-		});
-
+	const handleSocialLogin = (provider: 'google' | 'apple') => {
 		setIsLoading(true);
 
-		window.open(
-			`${process.env.NEXT_PUBLIC_API_BASE}${routes.api.auth.socialLogin(provider)}`,
-			'socialAuth',
-			'width=500,height=600',
-		);
+		// Save the current page so we can return here after auth
+		const returnUrl = window.location.pathname + window.location.search;
+		sessionStorage.setItem('authReturnUrl', returnUrl);
+		sessionStorage.setItem('authPending', 'true');
+
+		// Redirect to backend with return URL as query param
+		const authUrl = `${process.env.NEXT_PUBLIC_API_BASE}${routes.api.auth.socialLogin(provider)}?return_url=${encodeURIComponent(returnUrl)}`;
+
+		window.location.href = authUrl;
 	};
 
 	return (
