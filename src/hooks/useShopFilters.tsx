@@ -50,7 +50,7 @@ export const useShopFilters = () => {
 				router.push(`${pathname}?${params.toString()}`, { scroll: false });
 			});
 		},
-		[pathname, router, searchParams]
+		[pathname, router, searchParams],
 	);
 
 	// Toggle a category (useful for checkboxes)
@@ -63,7 +63,7 @@ export const useShopFilters = () => {
 
 			updateFilters({ tags: updated });
 		},
-		[getCurrentFilters, updateFilters]
+		[getCurrentFilters, updateFilters],
 	);
 
 	// Update price range
@@ -74,7 +74,7 @@ export const useShopFilters = () => {
 				max_price: maxPrice?.toString(),
 			});
 		},
-		[updateFilters]
+		[updateFilters],
 	);
 
 	// Clear all filters
@@ -89,7 +89,7 @@ export const useShopFilters = () => {
 		(filterKey: keyof FilterState) => {
 			updateFilters({ [filterKey]: undefined });
 		},
-		[updateFilters]
+		[updateFilters],
 	);
 
 	return {

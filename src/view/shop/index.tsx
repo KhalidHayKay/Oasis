@@ -63,14 +63,8 @@ const ShopView = ({
 		if (debouncedSearch !== filterHook.filters.search) {
 			filterHook.updateFilters({ search: debouncedSearch || undefined });
 		}
-	}, [debouncedSearch, filterHook]);
-
-	// Sync search input with URL params
-	useEffect(() => {
-		if (filterHook.filters.search !== searchQuery) {
-			Promise.resolve(() => setSearchQuery(filterHook.filters.search || ''));
-		}
-	}, [filterHook.filters.search, searchQuery]);
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [debouncedSearch]);
 
 	const handleApplyFilters = (filters: {
 		tags: string[];
