@@ -43,8 +43,12 @@ const routes = {
 			all: (query: string) => `/api/products${query ? `?${query}` : ''}`,
 			details: (slug: string) => `/api/products/${slug}`,
 		},
-		Inspiration: {
+		inspiration: {
 			all: '/api/inspirations',
+		},
+		blog: {
+			all: '/api/blogs',
+			content: (slug: string) => `/api/blogs/${slug}`,
 		},
 		cart: {
 			all: '/api/cart',
