@@ -25,8 +25,6 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 	isInitiatingAuth: true,
 
 	initializeAuth: async () => {
-		set({ isInitiatingAuth: true });
-
 		try {
 			const user = await authService.getUser();
 
@@ -111,6 +109,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 			set({
 				user: response.user,
 				isAuthenticated: true,
+				isInitiatingAuth: false,
 			});
 
 			appEvent.emit('login', response.user);

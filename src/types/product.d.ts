@@ -7,7 +7,10 @@ interface Product {
 		discount: number;
 	};
 	featuredImage: ProductImage;
-	category: string;
+	category: {
+		name: string;
+		slug: string;
+	};
 	tags: string[];
 	createdAt: string;
 	popularity: number;

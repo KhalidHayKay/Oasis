@@ -1,7 +1,5 @@
 'use client';
 
-import React, { useState } from 'react';
-
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
@@ -14,7 +12,10 @@ import {
 } from '@/components/ui/form';
 import { useCheckoutStore } from '@/store/useCheckoutStore';
 import { useEffect, useCallback } from 'react';
-import type { FooterButtonSetterType } from './checkout-drawer';
+import type {
+	FooterButtonSetterType,
+	IsLoadingSetterType,
+} from './checkout-drawer';
 import {
 	PaymentElement,
 	useElements,
@@ -87,6 +88,7 @@ type PaymentFormValues = z.infer<typeof paymentSchema>;
 interface PaymentViewProps {
 	checkoutSession: CheckoutSession;
 	setFooterButton: FooterButtonSetterType;
+	setIsLoading: IsLoadingSetterType;
 	next: () => void;
 	onSuccess: () => void;
 	onFailed: (
@@ -99,6 +101,7 @@ interface PaymentViewProps {
 const PaymentView = ({
 	checkoutSession,
 	setFooterButton,
+	setIsLoading,
 	next,
 	onSuccess,
 	onFailed,
@@ -120,23 +123,19 @@ const PaymentView = ({
 	const stripe = useStripe();
 	const elements = useElements();
 
-	const [isProcessing, setIsProcessing] = useState(false);
-
 	const confirmPayment = useCheckoutStore((state) => state.confirmPayment);
-
-	console.log('Processing payment: ', isProcessing);
 
 	const onSubmit = useCallback(
 		async (values: PaymentFormValues) => {
-			console.log('Billing address:', values);
-			console.log('Shipping address:', checkoutSession.shippingAddress);
-
 			if (!stripe || !elements) {
 				console.error('Stripe not loaded');
 				return;
 			}
 
-			setIsProcessing(true);
+			console.log('Billing address:', values);
+			console.log('Shipping address:', checkoutSession.shippingAddress);
+
+			setIsLoading(true);
 
 			try {
 				// Build billing details
@@ -215,7 +214,7 @@ const PaymentView = ({
 				toast.error('An error occurred during payment');
 			} finally {
 				appEvent.emit('checkoutCompleted', null);
-				setIsProcessing(false);
+				setIsLoading(false);
 			}
 		},
 		[
@@ -223,6 +222,7 @@ const PaymentView = ({
 			elements,
 			confirmPayment,
 			checkoutSession.shippingAddress,
+			setIsLoading,
 			next,
 			onSuccess,
 			onFailed,

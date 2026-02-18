@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { FooterButtonSetterType } from './checkout-drawer';
+import { FooterButtonSetterType, IsLoadingSetterType } from './checkout-drawer';
 import { useCheckoutStore } from '@/store/useCheckoutStore';
 import { toast } from 'sonner';
 import {
@@ -17,12 +17,14 @@ import Image from 'next/image';
 interface OrderSummaryViewProps {
 	checkoutSession: CheckoutSession;
 	setFooterButton: FooterButtonSetterType;
+	setIsLoading: IsLoadingSetterType;
 	next: () => void;
 }
 
 const OrderSummaryView = ({
 	checkoutSession,
 	setFooterButton,
+	setIsLoading,
 	next,
 }: OrderSummaryViewProps) => {
 	const {
@@ -74,6 +76,8 @@ const OrderSummaryView = ({
 	// Set footer button
 	useEffect(() => {
 		const handlePaymentIntent = async () => {
+			setIsLoading(true);
+
 			try {
 				await intendPayment(checkoutSession.publicToken);
 				next();
@@ -85,13 +89,22 @@ const OrderSummaryView = ({
 						: 'An error occured while creating payment intent',
 				);
 			}
+
+			setIsLoading(false);
 		};
 
 		setFooterButton({
 			label: 'Continue to Payment',
 			action: handlePaymentIntent,
 		});
-	}, [intendPayment, checkoutSession, setFooterButton, next, timeLeft]);
+	}, [
+		intendPayment,
+		checkoutSession,
+		setFooterButton,
+		setIsLoading,
+		next,
+		timeLeft,
+	]);
 
 	const isExpired = timeLeft === 'Expired';
 

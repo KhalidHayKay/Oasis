@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Factory, Gift, Star } from 'lucide-react';
+import { Factory, Gift, Loader2, Star } from 'lucide-react';
 import { useCartStore } from '@/store/useCartStore';
 import { processDiscount } from '@/lib/utils';
 
@@ -15,8 +15,6 @@ const Detail = ({ product }: DetailProps) => {
 	const items = useCartStore((state) => state.items);
 	const isLoading = useCartStore((state) => state.isLoading);
 	const isSyncing = useCartStore((state) => state.isSyncing);
-
-	// console.log(isLoading, isSyncing);
 
 	const { name, description, price, rating, colors } = product;
 
@@ -128,7 +126,11 @@ const Detail = ({ product }: DetailProps) => {
 						−
 					</button>
 
-					<span className='text-lg font-semibold'>{cartItem.quantity}</span>
+					{isLoading || isSyncing ? (
+						<Loader2 className='mr-2 h-4 w-4 animate-spin' />
+					) : (
+						<span className='text-lg font-semibold'>{cartItem.quantity}</span>
+					)}
 
 					<button
 						disabled={isLoading || isSyncing}

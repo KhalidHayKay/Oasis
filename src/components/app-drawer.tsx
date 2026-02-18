@@ -18,6 +18,7 @@ interface AppDrawerProps {
 	footerButton?: {
 		label: string;
 		onClick: () => void;
+		loading?: boolean;
 		className?: string;
 	};
 	onTriggerClick?: () => void;
@@ -64,6 +65,7 @@ export function AppDrawer({
 				{footerButton && (
 					<DrawerFooter className='p-0'>
 						<Button
+							disabled={footerButton.loading}
 							className={
 								footerButton.className ||
 								'size-full bg-brand-700 hover:bg-brand-800 rounded-none py-4'

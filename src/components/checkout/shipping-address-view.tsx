@@ -10,7 +10,7 @@ import {
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { toast } from 'sonner';
-import { FooterButtonSetterType } from './checkout-drawer';
+import { FooterButtonSetterType, IsLoadingSetterType } from './checkout-drawer';
 import { useEffect, useCallback } from 'react';
 import { useCheckoutStore } from '@/store/useCheckoutStore';
 
@@ -44,12 +44,14 @@ export type CheckoutFormValues = z.infer<typeof AddressSchema>;
 interface ShippingAddressViewProps {
 	userEmail: string;
 	setFooterButton: FooterButtonSetterType;
+	setIsLoading: IsLoadingSetterType;
 	next: () => void;
 }
 
 const ShippingAddressView = ({
 	userEmail,
 	setFooterButton,
+	setIsLoading,
 	next,
 }: ShippingAddressViewProps) => {
 	const form = useForm<CheckoutFormValues>({
@@ -68,27 +70,34 @@ const ShippingAddressView = ({
 	const setShippingAddress = useCheckoutStore((state) => state.addAddress);
 	const checkoutSession = useCheckoutStore((state) => state.session);
 
-	const onSubmit = useCallback(async (values: CheckoutFormValues) => {
-		const data: Address = {
-			fname: values.firstName,
-			lname: values.lastName,
-			phone: values.phone,
-			address: values.address,
-			country: values.country,
-			city: values.city,
-		};
+	const onSubmit = useCallback(
+		async (values: CheckoutFormValues) => {
+			const data: Address = {
+				fname: values.firstName,
+				lname: values.lastName,
+				phone: values.phone,
+				address: values.address,
+				country: values.country,
+				city: values.city,
+			};
 
-		try {
-			await setShippingAddress(data, checkoutSession?.publicToken as string);
-			next();
-		} catch (error) {
-			const message =
-				error instanceof Error
-					? error.message
-					: 'An error occured while trying to add address';
-			toast.error(message);
-		}
-	}, [checkoutSession, setShippingAddress, next]);
+			setIsLoading(true);
+
+			try {
+				await setShippingAddress(data, checkoutSession?.publicToken as string);
+				next();
+			} catch (error) {
+				const message =
+					error instanceof Error
+						? error.message
+						: 'An error occured while trying to add address';
+				toast.error(message);
+			}
+
+			setIsLoading(false);
+		},
+		[checkoutSession, setShippingAddress, next, setIsLoading],
+	);
 
 	useEffect(() => {
 		const handleFormSubmit = () => {

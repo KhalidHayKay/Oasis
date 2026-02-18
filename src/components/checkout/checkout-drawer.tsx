@@ -44,6 +44,8 @@ type ViewContentType = Record<
 	}
 >;
 
+export type IsLoadingSetterType = React.Dispatch<React.SetStateAction<boolean>>;
+
 export function CheckoutDrawer({
 	open,
 	onOpenChange,
@@ -52,7 +54,7 @@ export function CheckoutDrawer({
 }: CheckoutDrawerProps) {
 	const [currentView, setCurrentView] = useState<CheckoutView>('cart');
 	const [footerButton, setFooterButton] = useState<FooterButton | null>(null);
-
+	const [isLoading, setIsloading] = useState(false);
 	const [paymentErrorDetails, setPaymentErrorDetails] = useState<{
 		errorMessage: string;
 		shouldContactSupport: boolean;
@@ -67,10 +69,11 @@ export function CheckoutDrawer({
 	};
 
 	// Memoize callbacks to prevent infinite rerenders
-	const handleAddressNext = useCallback(() => setCurrentView('address'), []);
-	const handleSummaryNext = useCallback(() => setCurrentView('summary'), []);
-	const handlePaymentNext = useCallback(() => setCurrentView('payment'), []);
-	const handlePaid = useCallback(() => setCurrentView('processing'), []);
+	const goToAddress = useCallback(() => setCurrentView('address'), []);
+	const goToSummary = useCallback(() => setCurrentView('summary'), []);
+	const goToPayment = useCallback(() => setCurrentView('payment'), []);
+	const goToProcessing = useCallback(() => setCurrentView('processing'), []);
+
 	const handleSuccess = useCallback(() => setCurrentView('success'), []);
 	const handleFailure = useCallback(
 		(
@@ -89,12 +92,14 @@ export function CheckoutDrawer({
 	);
 
 	useEffect(() => {
-		if (session?.currentStep && session.currentStep !== currentView) {
-			Promise.resolve().then(() =>
-				setCurrentView(session.currentStep as CheckoutView),
-			);
-		}
-	}, [session?.currentStep, currentView]);
+		if (!session) return;
+
+		const syncView = (step: CheckoutView) => {
+			setCurrentView(step);
+		};
+
+		syncView(session.currentStep);
+	}, [session]);
 
 	// Reset drawer state when it closes
 	useEffect(() => {
@@ -111,7 +116,8 @@ export function CheckoutDrawer({
 					items={items}
 					setFooterButton={setFooterButton}
 					onAuthRequired={onAuthRequired}
-					next={handleAddressNext}
+					setIsLoading={setIsloading}
+					next={goToAddress}
 				/>
 			),
 		},
@@ -125,7 +131,8 @@ export function CheckoutDrawer({
 				<ShippingAddressView
 					userEmail={userEmail}
 					setFooterButton={setFooterButton}
-					next={handleSummaryNext}
+					setIsLoading={setIsloading}
+					next={goToSummary}
 				/>
 			),
 		},
@@ -135,7 +142,8 @@ export function CheckoutDrawer({
 				<OrderSummaryView
 					checkoutSession={session as CheckoutSession}
 					setFooterButton={setFooterButton}
-					next={handlePaymentNext}
+					setIsLoading={setIsloading}
+					next={goToPayment}
 				/>
 			),
 		},
@@ -146,7 +154,8 @@ export function CheckoutDrawer({
 					<PaymentCardView
 						checkoutSession={session as CheckoutSession}
 						setFooterButton={setFooterButton}
-						next={handlePaid}
+						setIsLoading={setIsloading}
+						next={goToProcessing}
 						onSuccess={handleSuccess}
 						onFailed={handleFailure}
 					/>
@@ -194,7 +203,11 @@ export function CheckoutDrawer({
 			onClose={handleClose}
 			footerButton={
 				footerButton
-					? { label: footerButton.label, onClick: footerButton.action }
+					? {
+							label: footerButton.label,
+							onClick: footerButton.action,
+							loading: isLoading,
+						}
 					: undefined
 			}
 		>

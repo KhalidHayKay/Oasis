@@ -1,4 +1,4 @@
-import { Calendar, ChevronRight } from 'lucide-react';
+import { Calendar, ChevronRight, ShoppingBag } from 'lucide-react';
 import StatusBadge from './status';
 import { FormatCurrency, FormatDate } from './format';
 import Link from 'next/link';
@@ -6,6 +6,29 @@ import routes from '@/config/routes';
 import Image from 'next/image';
 
 const OrdersView = ({ orders }: { orders: OrderPreview[] }) => {
+	if (orders.length === 0) {
+		return (
+			<div className='flex flex-col items-center justify-center py-20 text-center animate-in fade-in zoom-in-95 duration-500'>
+				<div className='size-20 bg-grey-50 rounded-full flex items-center justify-center mb-6'>
+					<ShoppingBag className='size-10 text-grey-400' />
+				</div>
+				<h2 className='text-2xl font-semibold text-foreground mb-2'>
+					No orders yet
+				</h2>
+				<p className='text-grey-600 mb-8 max-w-[280px]'>
+					Looks like you haven&apos;t made any purchases. Why not explore our latest
+					collection?
+				</p>
+				<Link
+					href={routes.page.shop}
+					className='inline-flex items-center justify-center bg-brand-800 text-white px-8 py-3 rounded-xl font-medium hover:bg-brand-900 transition-all active:scale-95'
+				>
+					Go to Shop
+				</Link>
+			</div>
+		);
+	}
+
 	return (
 		<div className='space-y-8 animate-in fade-in duration-500'>
 			<div className='flex flex-col gap-2'>

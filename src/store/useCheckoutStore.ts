@@ -61,7 +61,6 @@ export const useCheckoutStore = create<CheckoutState>()(
 			checkout: async () => {
 				try {
 					const result = await checkoutService.create();
-					console.log(result);
 					set({ session: result.session });
 				} catch (error) {
 					throw error;

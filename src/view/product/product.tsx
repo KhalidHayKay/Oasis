@@ -21,8 +21,8 @@ const Product = ({ product }: { product: ProductDetails }) => {
 			title: 'Categories',
 		},
 		{
-			href: routes.page.categories.view(category),
-			title: category,
+			href: routes.page.categories.view(category.slug),
+			title: category.name,
 		},
 	];
 

@@ -1,6 +1,6 @@
 import Image from 'next/image';
 import CartProduct from '../cart-product';
-import { FooterButtonSetterType } from './checkout-drawer';
+import { FooterButtonSetterType, IsLoadingSetterType } from './checkout-drawer';
 import { useEffect } from 'react';
 import { useCheckoutStore } from '@/store/useCheckoutStore';
 import { toast } from 'sonner';
@@ -10,6 +10,7 @@ interface CartViewProps {
 	items: CartItem[];
 	setFooterButton: FooterButtonSetterType;
 	onAuthRequired: () => void;
+	setIsLoading: IsLoadingSetterType;
 	next: () => void;
 }
 
@@ -17,6 +18,7 @@ const CartView = ({
 	items,
 	setFooterButton,
 	onAuthRequired,
+	setIsLoading,
 	next,
 }: CartViewProps) => {
 	const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
@@ -35,6 +37,8 @@ const CartView = ({
 				return;
 			}
 
+			setIsLoading(true);
+
 			try {
 				await checkout();
 				next?.();
@@ -43,6 +47,8 @@ const CartView = ({
 					error instanceof Error ? error.message : 'Could not process checkout',
 				);
 			}
+
+			setIsLoading(false);
 		};
 
 		setFooterButton({
@@ -56,6 +62,7 @@ const CartView = ({
 		checkout,
 		isAuthenticated,
 		onAuthRequired,
+		setIsLoading,
 		next,
 		setFooterButton,
 	]);
