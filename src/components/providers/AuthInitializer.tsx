@@ -5,7 +5,7 @@ import { setLogout } from '@/lib/api/auth';
 import { useAuthStore } from '@/store/useAuthStore';
 import { mountAppEventHandlers } from '@/lib/events/appEventHandler';
 import { toast } from 'sonner';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 
 let isSetup = false;
 if (!isSetup) {
@@ -19,13 +19,14 @@ const AuthInitializer = ({ children }: { children: React.ReactNode }) => {
 	const exchangeTokenForAuth = useAuthStore(
 		(state) => state.exchangeTokenForAuth,
 	);
-	const searchParams = useSearchParams();
+
 	const router = useRouter();
 
 	useEffect(() => {
 		const handleOAuthCallback = async () => {
-			const exchangeToken = searchParams.get('exchange_token');
-			const error = searchParams.get('error');
+			const params = new URLSearchParams(window.location.search);
+			const exchangeToken = params.get('exchange_token');
+			const error = params.get('error');
 
 			const cleanUrl = () => {
 				window.history.replaceState(null, '', window.location.pathname);
@@ -69,7 +70,7 @@ const AuthInitializer = ({ children }: { children: React.ReactNode }) => {
 
 		handleOAuthCallback();
 		setLogout(logout);
-	}, [searchParams, router, initializeAuth, logout, exchangeTokenForAuth]);
+	}, [, router, initializeAuth, logout, exchangeTokenForAuth]);
 
 	return <>{children}</>;
 };
