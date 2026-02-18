@@ -16,6 +16,7 @@ const routes = {
 		auth: {
 			me: '/api/auth/me',
 			refresh: '/api/auth/refresh',
+			exchange: '/api/auth/exchange',
 			register: '/api/auth/register',
 			login: '/api/auth/login',
 			socialLogin: (provider: string) => `/api/auth/provider/${provider}`,

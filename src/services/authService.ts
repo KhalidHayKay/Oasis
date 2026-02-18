@@ -12,6 +12,13 @@ export const authService = {
 		return res;
 	},
 
+	async exchangeToken(token: string) {
+		const res: AuthResponse = await http.post(routes.api.auth.exchange, {
+			exchange_token: token,
+		});
+		return res;
+	},
+
 	async login(credentials: LoginCredentials) {
 		const res: AuthResponse = await http.post(routes.api.auth.login, credentials);
 		return res;

@@ -15,13 +15,14 @@ interface AuthState {
 	//   sendVerificationCode: (email: string) => Promise<AuthResponse>;
 	logout: () => Promise<string>;
 	initializeAuth: () => Promise<void>;
+	exchangeTokenForAuth: (token: string) => Promise<AuthResponse>;
 }
 
 export const useAuthStore = create<AuthState>((set, get) => ({
 	// Initial state
 	user: null,
 	isAuthenticated: false,
-	isInitiatingAuth: false,
+	isInitiatingAuth: true,
 
 	initializeAuth: async () => {
 		set({ isInitiatingAuth: true });
@@ -101,6 +102,22 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 				isAuthenticated: false,
 				isInitiatingAuth: false,
 			});
+		}
+	},
+
+	exchangeTokenForAuth: async (token) => {
+		try {
+			const response = await authService.exchangeToken(token);
+			set({
+				user: response.user,
+				isAuthenticated: true,
+			});
+
+			appEvent.emit('login', response.user);
+
+			return response;
+		} catch (error) {
+			throw error;
 		}
 	},
 }));

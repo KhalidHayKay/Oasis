@@ -10,12 +10,12 @@ const Social = () => {
 		setIsLoading(true);
 
 		// Save the current page so we can return here after auth
-		const returnUrl = window.location.pathname + window.location.search;
-		sessionStorage.setItem('authReturnUrl', returnUrl);
+		const returnPath = window.location.pathname + window.location.search;
+		sessionStorage.setItem('authReturnPath', returnPath);
 		sessionStorage.setItem('authPending', 'true');
 
 		// Redirect to backend with return URL as query param
-		const authUrl = `${process.env.NEXT_PUBLIC_API_BASE}${routes.api.auth.socialLogin(provider)}?return_url=${encodeURIComponent(returnUrl)}`;
+		const authUrl = `${process.env.NEXT_PUBLIC_API_BASE}${routes.api.auth.socialLogin(provider)}?return_path=${encodeURIComponent(returnPath)}`;
 
 		window.location.href = authUrl;
 	};
