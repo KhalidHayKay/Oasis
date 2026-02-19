@@ -22,6 +22,8 @@ export const httpServer = {
 				.map((c) => `${c.name}=${c.value}`)
 				.join('; ');
 
+			console.log(cookieString);
+
 			const res = await api.get(url, {
 				params,
 				headers: cookieString ? { Cookie: cookieString } : {},

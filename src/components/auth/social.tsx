@@ -9,13 +9,14 @@ const Social = () => {
 	const handleSocialLogin = (provider: 'google' | 'apple') => {
 		setIsLoading(true);
 
-		// Save the current page so we can return here after auth
 		const returnPath = window.location.pathname + window.location.search;
+		const origin = window.location.origin;
+
 		sessionStorage.setItem('authReturnPath', returnPath);
 		sessionStorage.setItem('authPending', 'true');
 
-		// Redirect to backend with return URL as query param
-		const authUrl = `${process.env.NEXT_PUBLIC_API_BASE}${routes.api.auth.socialLogin(provider)}?return_path=${encodeURIComponent(returnPath)}`;
+		// Pass both return_path AND origin
+		const authUrl = `${process.env.NEXT_PUBLIC_API_BASE}${routes.api.auth.socialLogin(provider)}?return_path=${encodeURIComponent(returnPath)}&origin=${encodeURIComponent(origin)}`;
 
 		window.location.href = authUrl;
 	};
