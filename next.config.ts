@@ -16,6 +16,17 @@ const nextConfig: NextConfig = {
 		contentDispositionType: 'attachment',
 		unoptimized: true,
 	},
+
+	async rewrites() {
+		return [
+			{
+				// This matches any request starting with /api/proxy
+				source: '/api/proxy/:path*',
+				// This is your actual Render URL
+				destination: process.env.NEXT_PUBLIC_API_BASE + '/:path*',
+			},
+		];
+	},
 };
 
 export default nextConfig;

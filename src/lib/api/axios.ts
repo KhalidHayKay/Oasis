@@ -11,8 +11,11 @@ export interface ApiResponse<T> {
 	status: number;
 }
 
+const isServer = typeof window === 'undefined';
+
 export const api: AxiosInstance = axios.create({
-	baseURL: process.env.NEXT_PUBLIC_API_BASE,
+	// 1. If Client: use proxy. If Server: use the full backend URL.
+	baseURL: isServer ? process.env.NEXT_PUBLIC_API_BASE : '/api/proxy',
 	timeout: 60_000,
 	headers: {
 		'Content-Type': 'application/json',
@@ -27,10 +30,8 @@ export const api: AxiosInstance = axios.create({
 api.interceptors.request.use(
 	async (config: InternalAxiosRequestConfig) => {
 		// If we are on the Server (SSR)
-		if (typeof window === 'undefined') {
+		if (isServer) {
 			const token = await getValueFromCookie('auth_token');
-
-			console.log(token);
 
 			if (token) {
 				const plainToken = decodeURIComponent(token);

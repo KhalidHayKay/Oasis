@@ -1,6 +1,5 @@
 import routes from '@/config/routes';
 import { http } from '@/lib/api/http';
-// import { httpServer } from '@/lib/api/http-server';
 
 export const orderService = {
 	async all() {
