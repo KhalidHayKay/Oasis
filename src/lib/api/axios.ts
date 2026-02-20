@@ -3,6 +3,7 @@ import axios, {
 	AxiosResponse,
 	InternalAxiosRequestConfig,
 } from 'axios';
+import { getValueFromCookie } from './cookie';
 
 export interface ApiResponse<T> {
 	data: T;
@@ -24,7 +25,21 @@ export const api: AxiosInstance = axios.create({
  * REQUEST INTERCEPTOR
  */
 api.interceptors.request.use(
-	(config: InternalAxiosRequestConfig) => {
+	async (config: InternalAxiosRequestConfig) => {
+		// If we are on the Server (SSR)
+		if (typeof window === 'undefined') {
+			const token = await getValueFromCookie('auth_token');
+
+			console.log(token);
+
+			if (token) {
+				const plainToken = decodeURIComponent(token);
+				config.headers.Authorization = `Bearer ${plainToken}`;
+			}
+
+			config.headers.Referer = process.env.NEXT_PUBLIC_APP_URL;
+		}
+
 		return config;
 	},
 	(error) => Promise.reject(error),
