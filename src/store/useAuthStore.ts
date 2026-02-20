@@ -116,6 +116,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 
 			return response;
 		} catch (error) {
+			set({ isInitiatingAuth: false });
 			throw error;
 		}
 	},

@@ -14,7 +14,7 @@
 
 	.scrollbar-hide {
 		-ms-overflow-style: none;
-		scrollbar-width: none;
+		scrollbar-width: auto;
 	}
 	.scrollbar-hide::-webkit-scrollbar {
 		display: none;
@@ -169,4 +169,12 @@
 	body {
 		@apply bg-background text-foreground;
 	}
+}
+
+#nprogress .spinner {
+	display: none !important;
+}
+
+#nprogress .spinner-icon {
+	display: none !important;
 }

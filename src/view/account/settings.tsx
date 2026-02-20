@@ -24,10 +24,10 @@ const settingsSchema = z.object({
 
 type SettingsValues = z.infer<typeof settingsSchema>;
 
-const Settings = ({ initialData }: { initialData: SettingsValues }) => {
+const Settings = ({ preferences }: { preferences: UserPreferences }) => {
 	const form = useForm<SettingsValues>({
 		resolver: zodResolver(settingsSchema),
-		defaultValues: initialData,
+		defaultValues: preferences,
 	});
 
 	return (
@@ -40,7 +40,7 @@ const Settings = ({ initialData }: { initialData: SettingsValues }) => {
 						</CardTitle>
 					</CardHeader>
 					<CardContent className='divide-y'>
-						{(Object.keys(initialData) as Array<keyof SettingsValues>).map((key) => (
+						{(Object.keys(preferences) as Array<keyof SettingsValues>).map((key) => (
 							<FormField
 								key={key}
 								control={form.control}

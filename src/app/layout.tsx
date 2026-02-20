@@ -7,6 +7,7 @@ import './globals.css';
 import routes from '@/config/routes';
 import AuthInitializer from '@/components/providers/AuthInitializer';
 import { Toaster } from '@/components/ui/sonner';
+import NextTopLoader from 'nextjs-toploader';
 
 const _geist = Geist({ subsets: ['latin'] });
 const _geistMono = Geist_Mono({ subsets: ['latin'] });
@@ -30,24 +31,9 @@ export default function RootLayout({
 
 	return (
 		<html lang='en' className={`${_geist.className} ${_geistMono.className}`}>
-			{/* <head> */}
-			{/* Google tag (gtag.js) */}
-			{/* <Script
-					async
-					src='https://www.googletagmanager.com/gtag/js?id=G-3TZWEEVM2M'
-				></Script>
-				<Script>
-					{`
-						window.dataLayer = window.dataLayer || [];
-						function gtag(){dataLayer.push(arguments);}
-						gtag('js', new Date());
+			<body className={`font-sans antialiased scrollbar-hide`}>
+				<NextTopLoader color='#978ef8' showSpinner={false} />
 
-						gtag('config', 'G-3TZWEEVM2M');
-  					`}
-				</Script> */}
-			{/* </head> */}
-
-			<body className={`font-sans antialiased`}>
 				<AuthInitializer>
 					<Header navLinks={navLinks} />
 

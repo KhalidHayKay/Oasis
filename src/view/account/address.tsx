@@ -8,7 +8,10 @@ const Address = () => {
 		<div className='space-y-4 animate-in fade-in slide-in-from-bottom-2 duration-500'>
 			<div className='flex justify-between items-center'>
 				<h2 className='text-lg font-semibold'>Saved Addresses</h2>
-				<Button size='sm'>
+				<Button
+					size='sm'
+					className='h-9 bg-brand-700 hover:bg-brand-800 text-white rounded-md'
+				>
 					<Plus className='size-4 mr-2' /> Add New
 				</Button>
 			</div>

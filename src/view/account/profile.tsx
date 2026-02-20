@@ -24,23 +24,22 @@ import { useForm } from 'react-hook-form';
 import z from 'zod';
 
 const profileSchema = z.object({
-	firstName: z.string().min(2, 'First name must be at least 2 characters'),
-	lastName: z.string().min(2, 'Last name must be at least 2 characters'),
+	name: z.string().min(2, 'Last name must be at least 2 characters'),
 	email: z.email('Invalid email address'),
 	phone: z.string().min(10, 'Invalid phone number'),
 });
 
 type ProfileValues = z.infer<typeof profileSchema>;
-const Profile = ({
-	initialData,
-}: {
-	initialData: ProfileValues & { avatarUrl: string };
-}) => {
+const Profile = ({ user }: { user: User | null }) => {
 	const [isLoading, setIsLoading] = useState(false);
 
 	const form = useForm<ProfileValues>({
 		resolver: zodResolver(profileSchema),
-		defaultValues: initialData,
+		defaultValues: {
+			name: user?.name,
+			email: user?.email,
+			phone: '+123412341234',
+		},
 	});
 
 	async function onSubmit(values: ProfileValues) {
@@ -65,7 +64,7 @@ const Profile = ({
 						<div className='flex items-center gap-6'>
 							<div className='relative'>
 								<Avatar className='size-20 sm:size-24'>
-									<AvatarImage src={initialData.avatarUrl} />
+									<AvatarImage src={user?.avatar} />
 									<AvatarFallback>FU</AvatarFallback>
 								</Avatar>
 								<Button
@@ -82,7 +81,7 @@ const Profile = ({
 									JPG, PNG or GIF. Max 1MB.
 								</p>
 								<div className='flex gap-2 mt-2'>
-									<Button variant='outline' size='sm'>
+									<Button variant='outline' size='sm' className='bg-brand-50'>
 										Change
 									</Button>
 									<Button variant='ghost' size='sm' className='text-destructive'>
@@ -97,25 +96,12 @@ const Profile = ({
 						<div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
 							<FormField
 								control={form.control}
-								name='firstName'
+								name='name'
 								render={({ field }) => (
 									<FormItem>
-										<FormLabel>First Name</FormLabel>
+										<FormLabel>Name</FormLabel>
 										<FormControl>
-											<Input {...field} />
-										</FormControl>
-										<FormMessage />
-									</FormItem>
-								)}
-							/>
-							<FormField
-								control={form.control}
-								name='lastName'
-								render={({ field }) => (
-									<FormItem>
-										<FormLabel>Last Name</FormLabel>
-										<FormControl>
-											<Input {...field} />
+											<Input {...field} className='h-12 rounded-xl border-gray-200' />
 										</FormControl>
 										<FormMessage />
 									</FormItem>
@@ -128,7 +114,11 @@ const Profile = ({
 									<FormItem>
 										<FormLabel>Email</FormLabel>
 										<FormControl>
-											<Input type='email' {...field} />
+											<Input
+												type='email'
+												{...field}
+												className='h-12 rounded-xl border-gray-200'
+											/>
 										</FormControl>
 										<FormMessage />
 									</FormItem>
@@ -141,7 +131,11 @@ const Profile = ({
 									<FormItem>
 										<FormLabel>Phone Number</FormLabel>
 										<FormControl>
-											<Input type='tel' {...field} />
+											<Input
+												type='tel'
+												{...field}
+												className='h-12 rounded-xl border-gray-200'
+											/>
 										</FormControl>
 										<FormMessage />
 									</FormItem>
@@ -151,7 +145,11 @@ const Profile = ({
 					</CardContent>
 				</Card>
 				<div className='flex justify-end'>
-					<Button type='submit' disabled={isLoading}>
+					<Button
+						type='submit'
+						disabled={isLoading}
+						className='h-12 bg-brand-700 hover:bg-brand-800 text-white rounded-full'
+					>
 						{isLoading && <Loader2 className='mr-2 size-4 animate-spin' />}
 						Save Changes
 					</Button>
