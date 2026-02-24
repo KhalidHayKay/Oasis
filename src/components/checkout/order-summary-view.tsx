@@ -45,7 +45,6 @@ const OrderSummaryView = ({
 
 	const onEditAddress = () => {
 		// Logic to go back to address view
-		// next();
 		console.log('Edit address');
 	};
 

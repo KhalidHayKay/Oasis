@@ -41,18 +41,13 @@ const AuthInitializer = ({ children }: { children: React.ReactNode }) => {
 
 			// Handle OAuth exchange
 			if (exchangeToken) {
-				console.log('🔄 Exchanging token...');
-
 				try {
-					// Exchange for HttpOnly cookie via API
 					const response = await exchangeTokenForAuth(exchangeToken);
 
-					// Clean URL
 					cleanUrl();
 
 					toast.success(response.message);
 
-					// Cleanup
 					sessionStorage.removeItem('authPending');
 					sessionStorage.removeItem('authReturnPath');
 				} catch (err) {

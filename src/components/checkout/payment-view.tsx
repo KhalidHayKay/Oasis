@@ -138,37 +138,6 @@ const PaymentView = ({
 			setIsLoading(true);
 
 			try {
-				// Build billing details
-				{
-					/*const billingDetails = values.useShipping
-					? {
-							// Use shipping address from checkoutSession
-							name: `${checkoutSession.shippingAddress.firstName} ${checkoutSession.shippingAddress.lastName}`,
-							phone: checkoutSession.shippingAddress.phone,
-							address: {
-								line1: checkoutSession.shippingAddress.address,
-								city: checkoutSession.shippingAddress.city,
-								country: checkoutSession.shippingAddress.country,
-								postal_code: '00000',
-								state: 'N/A',
-							},
-						}
-					: {
-							// Use custom billing address
-							name: `${values.firstName} ${values.lastName}`,
-							phone: values.phone,
-							address: {
-								line1: values.address,
-								city: values.city,
-								country: values.country,
-								postal_code: '00000',
-								state: 'N/A',
-							},
-						};
-						*/
-				}
-				// console.log(billingDetails);
-
 				const { error, paymentIntent } = await stripe.confirmPayment({
 					elements,
 					confirmParams: {

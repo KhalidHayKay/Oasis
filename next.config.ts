@@ -20,9 +20,7 @@ const nextConfig: NextConfig = {
 	async rewrites() {
 		return [
 			{
-				// This matches any request starting with /api/proxy
-				source: '/api/proxy/:path*',
-				// This is your actual Render URL
+				source: process.env.NEXT_PUBLIC_API_PROXY + '/:path*',
 				destination: process.env.NEXT_PUBLIC_API_BASE + '/:path*',
 			},
 		];
