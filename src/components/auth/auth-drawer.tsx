@@ -74,9 +74,10 @@ export function AuthDrawer({
 			case 'signup':
 				return (
 					<SignupForm
-						onSuccess={(userEmail: string) => {
-							setEmail(userEmail);
-							setCurrentView('verify-email');
+						onSuccess={(_userEmail: string) => {
+							handleSuccess();
+							// setEmail(userEmail);
+							// setCurrentView('verify-email');
 						}}
 						onSwitchToLogin={() => setCurrentView('login')}
 					/>

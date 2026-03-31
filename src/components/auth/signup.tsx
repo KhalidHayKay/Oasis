@@ -59,7 +59,7 @@ export function SignupForm({ onSuccess, onSwitchToLogin }: SignupFormProps) {
 		try {
 			const res = await signup(data);
 			onSuccess(data.email);
-			toast.success(res.message || 'Reg successful');
+			toast.success(res.message || 'Registration successful');
 		} catch (error) {
 			const message =
 				error instanceof Error
