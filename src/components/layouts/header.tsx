@@ -32,13 +32,16 @@ export function Header({ navLinks }: { navLinks: { label: string; href: string }
         entry: 'login',
     });
     const openAuthDrawer = (entry: AuthView) => {
-        setAuthState({
-            open: true,
-            entry,
-        });
+        setAuthState({ open: true, entry, });
     };
     const closeAuthDrawer = () => {
         setAuthState({ open: false, entry: 'login' });
+    };
+    const handleOpenChange = (open: boolean) => {
+        setAuthState(prev => ({
+            ...prev,
+            open,
+        }));
     };
 
     const isInitiatingAuth = useAuthStore((state) => state.isInitiatingAuth);
@@ -185,7 +188,8 @@ export function Header({ navLinks }: { navLinks: { label: string; href: string }
             <AuthDrawer
                 key={`${authState.open}-${authState.entry}`}
                 state={authState}
-                onClose={closeAuthDrawer}
+                onOpenChange={handleOpenChange}
+                onClose={() => handleOpenChange(false)}
                 onSuccess={handleAuthSuccess}
                 userEmail={user?.email}
             />

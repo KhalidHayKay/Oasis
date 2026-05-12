@@ -18,6 +18,7 @@ import Social from './social';
 import { useAuthStore } from '@/store/useAuthStore';
 import { toast } from 'sonner';
 import Image from 'next/image';
+import Link from 'next/link';
 
 const signupSchema = z
 	.object({
@@ -185,13 +186,13 @@ export function SignupForm({ onSuccess, onSwitchToLogin }: SignupFormProps) {
 								<div className='leading-none'>
 									<label className='text-sm text-gray-600'>
 										I agree to the{' '}
-										<a href='/terms' className='text-brand-700 hover:underline'>
+										<Link href='/terms' target='_blank' className='text-brand-700 hover:underline'>
 											Terms & Conditions
-										</a>{' '}
+										</Link>{' '}
 										of Oasis and acknowledge the a{' '}
-										<a href='/terms' className='text-brand-700 hover:underline'>
+										<Link href='/terms' target='_blank' className='text-brand-700 hover:underline'>
 											Privacy Policy
-										</a>
+										</Link>
 									</label>
 									<FormMessage />
 								</div>

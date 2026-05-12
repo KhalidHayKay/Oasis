@@ -14,6 +14,8 @@ import {
 import { Input } from '@/components/ui/input';
 import { Loader2 } from 'lucide-react';
 import Image from 'next/image';
+import { authService } from '@/services/authService';
+import { toast } from 'sonner';
 const forgotPasswordSchema = z.object({
 	email: z.email('Invalid email address').max(255, 'Email is too long'),
 });
@@ -21,7 +23,7 @@ const forgotPasswordSchema = z.object({
 type ForgotPasswordFormValues = z.infer<typeof forgotPasswordSchema>;
 
 interface ForgotPasswordFormProps {
-	onSuccess: (userEmail: string, token: string) => void;
+	onSuccess: (userEmail: string) => void;
 	onBack?: () => void;
 }
 
@@ -37,35 +39,19 @@ export function ForgotPasswordForm({
 	});
 
 	const onSubmit = async (data: ForgotPasswordFormValues) => {
-		console.log(data);
-		onSuccess(data.email, '');
-		// setIsLoading(true);
-		// try {
-		// 	const response = await authService.forgotPassword({
-		// 		email,
-		// 		token,
-		// 		...data,
-		// 	});
-		// 	toast({
-		// 		title: 'Success',
-		// 		description: response.message || 'Password reset successfully!',
-		// 	});
-		// 	onSuccess?.();
-		// } catch (error: any) {
-		// 	toast({
-		// 		title: 'Error',
-		// 		description: error.message || 'Failed to reset password. Please try again.',
-		// 		variant: 'destructive',
-		// 	});
-		// } finally {
-		// 	setIsLoading(false);
-		// }
+		try {
+			const response = await authService.forgetPassword(data.email);
+			toast.success(response.message || 'Password reset successfully!')
+			onSuccess?.(data.email,);
+		} catch (error: any) {
+			toast.error(error.message || 'Failed to reset password. Please try again.');
+		}
 	};
 
 	return (
 		<div className='space-y-6 sm:px-10'>
 			<div className='space-y-2'>
-				<div className='size-[150px] mx-auto mb-4'>
+				<div className='size-37.5 mx-auto mb-4'>
 					<Image
 						width={400}
 						height={250}

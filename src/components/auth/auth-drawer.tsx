@@ -12,25 +12,19 @@ export type AuthView = 'login' | 'signup' | 'verify-email' | 'forgot-password' |
 
 interface AuthDrawerProps {
     state: { open: boolean; entry: AuthView };
+    onOpenChange: (open: boolean) => void
     onClose: () => void;
     onSuccess?: () => void;
     userEmail?: string; // For verify-email view
 }
 
-export function AuthDrawer({ state, onClose, onSuccess, userEmail = '' }: AuthDrawerProps) {
+export function AuthDrawer({ state, onOpenChange, onClose, onSuccess, userEmail = '' }: AuthDrawerProps) {
     const [currentView, setCurrentView] = useState<AuthView>(state.entry);
     const [email, setEmail] = useState(userEmail);
-    const [resetToken, setResetToken] = useState('');
 
     const handleSuccess = () => {
         onSuccess?.();
     };
-
-    // useEffect(() => {
-    //     if (state) {
-    //         setCurrentView(state.entry ?? 'login');
-    //     }
-    // }, [state]);
 
     const getTitle = () => {
         switch (currentView) {
@@ -77,9 +71,8 @@ export function AuthDrawer({ state, onClose, onSuccess, userEmail = '' }: AuthDr
             case 'forgot-password':
                 return (
                     <ForgotPasswordForm
-                        onSuccess={(userEmail: string, token: string) => {
+                        onSuccess={(userEmail: string) => {
                             setEmail(userEmail);
-                            setResetToken(token);
                             setCurrentView('reset-password');
                         }}
                         onBack={() => setCurrentView('login')}
@@ -90,11 +83,10 @@ export function AuthDrawer({ state, onClose, onSuccess, userEmail = '' }: AuthDr
                 return (
                     <ResetPasswordForm
                         email={email}
-                        token={resetToken}
                         onSuccess={() => {
                             setCurrentView('login');
-                            // Optional: show success toast
                         }}
+                        onReRequest={() => { setCurrentView('forgot-password') }}
                     />
                 );
 
@@ -104,7 +96,7 @@ export function AuthDrawer({ state, onClose, onSuccess, userEmail = '' }: AuthDr
     };
 
     return (
-        <AppDrawer title={getTitle()} open={state.open} onClose={onClose}>
+        <AppDrawer title={getTitle()} open={state.open} onClose={onClose} onOpenChange={onOpenChange}>
             {renderContent()}
         </AppDrawer>
     );
