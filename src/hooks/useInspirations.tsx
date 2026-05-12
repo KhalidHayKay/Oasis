@@ -1,36 +1,32 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 
 export function useInspirations(inspirations: Inspiration[]) {
-	const [displayedInspirations, setDisplayedInspirations] = useState<
-		Inspiration[]
-	>([]);
+    // Show 12 inspirations initially (4 per column on desktop)
+    const displaySize = 12;
 
-	const displaySize = 12; // Show 12 inspirations initially (4 per column on desktop)
+    const [displayedInspirations, setDisplayedInspirations] = useState<Inspiration[]>(
+        inspirations.slice(0, displaySize)
+    );
 
-	const handleShowMore = () => {
-		setDisplayedInspirations((prev) => {
-			const nextCount = Math.min(prev.length + displaySize, inspirations.length);
-			return inspirations.slice(0, nextCount);
-		});
-	};
+    const hasMore = displayedInspirations.length < inspirations.length;
 
-	const handleCollapse = () => {
-		setDisplayedInspirations(inspirations.slice(0, displaySize));
-	};
+    const handleShowMore = () => {
+        setDisplayedInspirations((prev) => {
+            const nextCount = Math.min(prev.length + displaySize, inspirations.length);
+            return inspirations.slice(0, nextCount);
+        });
+    };
 
-	const hasMore = displayedInspirations.length < inspirations.length;
+    const handleCollapse = () => {
+        setDisplayedInspirations(inspirations.slice(0, displaySize));
+    };
 
-	// Reset displayed inspirations when the inspirations array changes (category filter)
-	useEffect(() => {
-		setDisplayedInspirations(inspirations.slice(0, displaySize));
-	}, [inspirations]);
-
-	return {
-		displayedInspirations,
-		handleShowMore,
-		hasMore,
-		handleCollapse,
-	};
+    return {
+        displayedInspirations,
+        handleShowMore,
+        hasMore,
+        handleCollapse,
+    };
 }

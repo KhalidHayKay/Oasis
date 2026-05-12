@@ -13,185 +13,189 @@ import Logo from '../logo';
 import { CheckoutDrawer } from '../checkout/checkout-drawer';
 import { useCartStore } from '@/store/useCartStore';
 import { toast } from 'sonner';
+import { AuthDrawer, AuthView } from '../auth/auth-drawer';
 
-type AuthView =
-	| 'login'
-	| 'signup'
-	| 'verify-email'
-	| 'forgot-password'
-	| 'reset-password';
+export function Header({ navLinks }: { navLinks: { label: string; href: string }[] }) {
+    const pathname = usePathname();
 
-export function Header({
-	navLinks,
-}: {
-	navLinks: { label: string; href: string }[];
-}) {
-	const pathname = usePathname();
+    const [scrollDepth, setScrollDepth] = useState(0);
+    const [isCartOpen, setIsCartOpen] = useState(false);
 
-	const [scrollDepth, setScrollDepth] = useState(0);
-	const [isCartOpen, setIsCartOpen] = useState(false);
+    // Mobile nav visibility
+    const [isMobileNavVisible, setIsMobileNavVisible] = useState(true);
+    const [lastScrollY, setLastScrollY] = useState(0);
 
-	// Mobile nav visibility
-	const [isMobileNavVisible, setIsMobileNavVisible] = useState(true);
-	const [lastScrollY, setLastScrollY] = useState(0);
+    // Auth drawer state
+    const [pendingCheckout, setPendingCheckout] = useState(false);
+    const [authState, setAuthState] = useState<{ open: boolean; entry: AuthView }>({
+        open: false,
+        entry: 'login',
+    });
+    const openAuthDrawer = (entry: AuthView) => {
+        setAuthState({
+            open: true,
+            entry,
+        });
+    };
+    const closeAuthDrawer = () => {
+        setAuthState({ open: false, entry: 'login' });
+    };
 
-	// Auth drawer state
-	const [isAuthDrawerOpen, setIsAuthDrawerOpen] = useState(false);
-	const [authView, setAuthView] = useState<AuthView>('login');
-	const [pendingCheckout, setPendingCheckout] = useState(false);
+    const isInitiatingAuth = useAuthStore((state) => state.isInitiatingAuth);
+    const user = useAuthStore((state) => state.user);
+    const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
+    const totalCartItems = useCartStore((state) => state.getTotalItems());
 
-	const isInitiatingAuth = useAuthStore((state) => state.isInitiatingAuth);
-	const user = useAuthStore((state) => state.user);
-	const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
-	const totalCartItems = useCartStore((state) => state.getTotalItems());
+    const activeNav = navLinks.find((link) => pathname === link.href)?.label || '';
 
-	const activeNav = navLinks.find((link) => pathname === link.href)?.label || '';
+    const handleWindowScroll = useCallback(() => {
+        const currentScrollY = window.scrollY;
 
-	const handleWindowScroll = useCallback(() => {
-		const currentScrollY = window.scrollY;
+        // Only hide mobile nav when scrolling down on mobile
+        setIsMobileNavVisible(currentScrollY < lastScrollY || currentScrollY < 20);
+        setLastScrollY(currentScrollY);
+        setScrollDepth(currentScrollY);
+    }, [lastScrollY]);
 
-		// Only hide mobile nav when scrolling down on mobile
-		setIsMobileNavVisible(currentScrollY < lastScrollY || currentScrollY < 20);
-		setLastScrollY(currentScrollY);
-		setScrollDepth(currentScrollY);
-	}, [lastScrollY]);
+    useEffect(() => {
+        window.addEventListener('scroll', handleWindowScroll);
 
-	useEffect(() => {
-		window.addEventListener('scroll', handleWindowScroll);
+        return () => {
+            window.removeEventListener('scroll', handleWindowScroll);
+        };
+    }, [lastScrollY, handleWindowScroll]);
 
-		return () => {
-			window.removeEventListener('scroll', handleWindowScroll);
-		};
-	}, [lastScrollY, handleWindowScroll]);
+    // Handles auth success - reopen checkout if user was trying to checkout
+    const handleAuthSuccess = () => {
+        closeAuthDrawer();
 
-	// Handles auth success - reopen checkout if user was trying to checkout
-	const handleAuthSuccess = () => {
-		setIsAuthDrawerOpen(false);
+        if (pendingCheckout) {
+            setPendingCheckout(false);
 
-		if (pendingCheckout) {
-			setPendingCheckout(false);
+            setTimeout(() => {
+                setIsCartOpen(true);
+            }, 300);
+        }
+    };
 
-			setTimeout(() => {
-				setIsCartOpen(true);
-			}, 300);
-		}
-	};
+    // Handles when checkout requires authentication
+    const handleAuthRequired = () => {
+        setPendingCheckout(true);
+        setIsCartOpen(false);
 
-	// Handles when checkout requires authentication
-	const handleAuthRequired = () => {
-		setPendingCheckout(true);
-		setIsCartOpen(false);
-		setAuthView('login');
+        toast.error('You need to be authenticated');
 
-		toast.error('You need to be authenticated');
+        setTimeout(() => {
+            openAuthDrawer('login');
+        }, 300);
+    };
 
-		setTimeout(() => {
-			setIsAuthDrawerOpen(true);
-		}, 300);
-	};
+    return (
+        <header
+            inert={false}
+            className={cn(
+                'fixed top-0 z-50 w-full bg-white transition-all duration-200',
+                scrollDepth >= 80 ? 'border-b border-grey-100 shadow-sm' : ''
+            )}
+        >
+            <div className='px-2 sm:px-6 lg:px-12'>
+                <div className='flex items-center justify-between h-16 lg:h-20'>
+                    <Logo />
 
-	return (
-		<header
-			inert={false}
-			className={cn(
-				'fixed top-0 z-50 w-full bg-white transition-all duration-200',
-				scrollDepth >= 80 ? 'border-b border-grey-100 shadow-sm' : '',
-			)}
-		>
-			<div className='px-2 sm:px-6 lg:px-12'>
-				<div className='flex items-center justify-between h-16 lg:h-20'>
-					<Logo />
+                    {/* Navigation - Hidden on mobile, shown on md+ */}
+                    <nav className='hidden md:flex items-center gap-8 absolute left-2/5 lg:left-1/2 -translate-x-1/2'>
+                        {navLinks.map((link, i) => (
+                            <Link
+                                key={i}
+                                href={link.href}
+                                className={cn(
+                                    'text-sm font-medium transition-colors hover:text-grey-900 relative',
+                                    activeNav.toLowerCase() === link.label.toLowerCase()
+                                        ? 'text-grey-900'
+                                        : 'text-grey-500'
+                                )}
+                            >
+                                {link.label.toUpperCase()}
+                                {activeNav.toLowerCase() === link.label.toLowerCase() && (
+                                    <span className='absolute -bottom-1 left-0 right-0 h-0.5 bg-grey-900' />
+                                )}
+                            </Link>
+                        ))}
+                    </nav>
 
-					{/* Navigation - Hidden on mobile, shown on md+ */}
-					<nav className='hidden md:flex items-center gap-8 absolute left-2/5 lg:left-1/2 -translate-x-1/2'>
-						{navLinks.map((link, i) => (
-							<Link
-								key={i}
-								href={link.href}
-								className={cn(
-									'text-sm font-medium transition-colors hover:text-grey-900 relative',
-									activeNav.toLowerCase() === link.label.toLowerCase()
-										? 'text-grey-900'
-										: 'text-grey-500',
-								)}
-							>
-								{link.label.toUpperCase()}
-								{activeNav.toLowerCase() === link.label.toLowerCase() && (
-									<span className='absolute -bottom-1 left-0 right-0 h-0.5 bg-grey-900' />
-								)}
-							</Link>
-						))}
-					</nav>
+                    {/* Right side actions */}
+                    <div className='flex items-center gap-3 lg:gap-4'>
+                        <Button
+                            onClick={() => setIsCartOpen(true)}
+                            variant='outline'
+                            size='sm'
+                            className='gap-2 rounded-full border-grey-300 text-grey-700 hover:bg-grey-50 hover:text-grey-900 hover:border-grey-400 relative'
+                        >
+                            <span className='hidden sm:inline text-xs font-medium tracking-wide'>
+                                MY CART
+                            </span>
+                            <ShoppingBag className='w-4 h-4' />
+                            {totalCartItems > 0 && (
+                                <span className='absolute -top-1 -right-1 inline-flex items-center justify-center min-w-3 sm:min-w-4 h-3 sm:h-4 px-1 text-[9px] sm:text-[10px] font-bold text-white bg-brandRed rounded-full'>
+                                    {totalCartItems > 99 ? '99+' : totalCartItems}
+                                </span>
+                            )}
+                        </Button>
 
-					{/* Right side actions */}
-					<div className='flex items-center gap-3 lg:gap-4'>
-						<Button
-							onClick={() => setIsCartOpen(true)}
-							variant='outline'
-							size='sm'
-							className='gap-2 rounded-full border-grey-300 text-grey-700 hover:bg-grey-50 hover:text-grey-900 hover:border-grey-400 relative'
-						>
-							<span className='hidden sm:inline text-xs font-medium tracking-wide'>
-								MY CART
-							</span>
-							<ShoppingBag className='w-4 h-4' />
-							{totalCartItems > 0 && (
-								<span className='absolute -top-1 -right-1 inline-flex items-center justify-center min-w-3 sm:min-w-4 h-3 sm:h-4 px-1 text-[9px] sm:text-[10px] font-bold text-white bg-brandRed rounded-full'>
-									{totalCartItems > 99 ? '99+' : totalCartItems}
-								</span>
-							)}
-						</Button>
+                        {isInitiatingAuth ? (
+                            <Skeleton className='w-8 h-8 rounded-full bg-brand-100' />
+                        ) : (
+                            <AppUser
+                                isAuthenticated={isAuthenticated}
+                                user={user}
+                                openDrawer={openAuthDrawer}
+                            />
+                        )}
+                    </div>
+                </div>
 
-						{isInitiatingAuth ? (
-							<Skeleton className='w-8 h-8 rounded-full bg-brand-100' />
-						) : (
-							<AppUser
-								isAuthenticated={isAuthenticated}
-								user={user}
-								isAuthDrawerOpen={isAuthDrawerOpen}
-								setIsAuthDrawerOpen={setIsAuthDrawerOpen}
-								authView={authView}
-								setAuthView={setAuthView}
-								onAuthSuccess={handleAuthSuccess}
-							/>
-						)}
-					</div>
-				</div>
+                {/* Mobile navigation - hides on scroll down */}
+                <nav
+                    className={cn(
+                        'md:hidden flex items-center gap-6 pb-3 border-t border-grey-100 pt-3',
+                        'transition-all duration-200 overflow-hidden',
+                        isMobileNavVisible ? 'max-h-20 opacity-100' : 'max-h-0 opacity-0 py-0'
+                    )}
+                >
+                    {navLinks.map((link, i) => (
+                        <Link
+                            key={i}
+                            href={link.href}
+                            className={cn(
+                                'text-sm font-medium transition-colors relative',
+                                activeNav.toLowerCase() === link.label.toLowerCase()
+                                    ? 'text-grey-900'
+                                    : 'text-grey-500'
+                            )}
+                        >
+                            {link.label.toUpperCase()}
+                            {activeNav.toLowerCase() === link.label.toLowerCase() && (
+                                <span className='absolute -bottom-3 left-0 right-0 h-0.5 bg-grey-900' />
+                            )}
+                        </Link>
+                    ))}
+                </nav>
+            </div>
 
-				{/* Mobile navigation - hides on scroll down */}
-				<nav
-					className={cn(
-						'md:hidden flex items-center gap-6 pb-3 border-t border-grey-100 pt-3',
-						'transition-all duration-200 overflow-hidden',
-						isMobileNavVisible ? 'max-h-20 opacity-100' : 'max-h-0 opacity-0 py-0',
-					)}
-				>
-					{navLinks.map((link, i) => (
-						<Link
-							key={i}
-							href={link.href}
-							className={cn(
-								'text-sm font-medium transition-colors relative',
-								activeNav.toLowerCase() === link.label.toLowerCase()
-									? 'text-grey-900'
-									: 'text-grey-500',
-							)}
-						>
-							{link.label.toUpperCase()}
-							{activeNav.toLowerCase() === link.label.toLowerCase() && (
-								<span className='absolute -bottom-3 left-0 right-0 h-0.5 bg-grey-900' />
-							)}
-						</Link>
-					))}
-				</nav>
-			</div>
+            <AuthDrawer
+                key={`${authState.open}-${authState.entry}`}
+                state={authState}
+                onClose={closeAuthDrawer}
+                onSuccess={handleAuthSuccess}
+                userEmail={user?.email}
+            />
 
-			<CheckoutDrawer
-				open={isCartOpen}
-				onOpenChange={setIsCartOpen}
-				userEmail={user?.email}
-				onAuthRequired={handleAuthRequired}
-			/>
-		</header>
-	);
+            <CheckoutDrawer
+                open={isCartOpen}
+                onOpenChange={setIsCartOpen}
+                userEmail={user?.email}
+                onAuthRequired={handleAuthRequired}
+            />
+        </header>
+    );
 }
