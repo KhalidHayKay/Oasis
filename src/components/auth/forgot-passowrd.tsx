@@ -43,8 +43,10 @@ export function ForgotPasswordForm({
 			const response = await authService.forgetPassword(data.email);
 			toast.success(response.message || 'Password reset successfully!')
 			onSuccess?.(data.email,);
-		} catch (error: any) {
-			toast.error(error.message || 'Failed to reset password. Please try again.');
+		} catch (error) {
+			const message =
+				error instanceof Error ? error.message : 'Failed to reset password. Please try again.'
+			toast.error(message);
 		}
 	};
 

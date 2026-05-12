@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { AppDrawer } from '@/components/app-drawer';
 import { LoginForm } from '@/components/auth/login';
 import { SignupForm } from '@/components/auth/signup';
@@ -12,15 +12,21 @@ export type AuthView = 'login' | 'signup' | 'verify-email' | 'forgot-password' |
 
 interface AuthDrawerProps {
     state: { open: boolean; entry: AuthView };
-    onOpenChange: (open: boolean) => void
     onClose: () => void;
     onSuccess?: () => void;
     userEmail?: string; // For verify-email view
 }
 
-export function AuthDrawer({ state, onOpenChange, onClose, onSuccess, userEmail = '' }: AuthDrawerProps) {
+export function AuthDrawer({ state, onClose, onSuccess, userEmail = '' }: AuthDrawerProps) {
     const [currentView, setCurrentView] = useState<AuthView>(state.entry);
     const [email, setEmail] = useState(userEmail);
+
+    useEffect(() => {
+        if (state.open) {
+            // eslint-disable-next-line react-hooks/set-state-in-effect
+            setCurrentView(state.entry);
+        }
+    }, [state.open, state.entry]);
 
     const handleSuccess = () => {
         onSuccess?.();
@@ -96,7 +102,7 @@ export function AuthDrawer({ state, onOpenChange, onClose, onSuccess, userEmail 
     };
 
     return (
-        <AppDrawer title={getTitle()} open={state.open} onClose={onClose} onOpenChange={onOpenChange}>
+        <AppDrawer title={getTitle()} open={state.open} onClose={onClose} onOpenChange={onClose}>
             {renderContent()}
         </AppDrawer>
     );

@@ -60,8 +60,10 @@ export function ResetPasswordForm({
 			});
 			toast.success(response.message || 'Password reset successfully!')
 			onSuccess?.();
-		} catch (error: any) {
-			toast.error(error.message || 'Failed to reset password. Please try again.')
+		} catch (error) {
+			const message =
+				error instanceof Error ? error.message : 'Failed to reset password. Please try again.'
+			toast.error(message)
 		}
 	};
 
